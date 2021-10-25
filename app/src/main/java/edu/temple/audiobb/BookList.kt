@@ -2,22 +2,22 @@ package edu.temple.audiobb
 
 class BookList() {
 
-    val bookList: MutableList<Book> = ArrayList()
+    val list: MutableList<Book> = ArrayList()
 
     fun add(book: Book) {
-        bookList.add(book)
+        list.add(book)
     }
 
     fun remove(book: Book) {
-        bookList.remove(book)
+        list.remove(book)
     }
 
     fun get(b: Int): Book {
-        return bookList[b + 1]
+        return list[b + 1]
     }
 
     fun size(): Int {
-        return bookList.size
+        return list.size
     }
-    
+
 }
