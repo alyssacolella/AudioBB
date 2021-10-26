@@ -2,13 +2,62 @@ package edu.temple.audiobb
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import androidx.lifecycle.ViewModelProvider
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), BookListFragment.EventInterface {
+
+    var twoPane = false //default to small portrait
+    lateinit var bookViewModel: BookViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.small_portrait)
 
+        //flag to determine if there are two fragment containers
+        twoPane = findViewById<View>(R.id.container2) != null
+
+        bookViewModel = ViewModelProvider(this).get(BookViewModel::class.java)
+
+        if(supportFragmentManager.findFragmentById(R.id.container1) is BookListFragment
+            && bookViewModel.getBook().value == null)
+                supportFragmentManager.popBackStack()
+
+        if(supportFragmentManager.findFragmentById(R.id.container1) is BookListFragment
+            && twoPane)
+                supportFragmentManager.popBackStack()
+
+        if(twoPane) {
+            if(supportFragmentManager.findFragmentById(R.id.container2) == null)
+                supportFragmentManager.beginTransaction()
+                    .add(R.id.container2, BookDetailsFragment())
+                    .commit()
+        }else if (bookViewModel.getBook().value != null){
+            supportFragmentManager.beginTransaction()
+                .add(R.id.container1, BookDetailsFragment())
+                .addToBackStack(null)
+                .commit()
+        }
+
+
         //create an instance of BookList class, populate with Book objects
+        val bookList = generateBooks()
+
+        supportFragmentManager.beginTransaction()
+            .add(R.id.container1, BookListFragment.newInstance(bookList))
+    }
+
+    override fun selectionMade() {
+        // only respond if there is a single container
+        if (!twoPane)
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.container1, BookDetailsFragment())
+                .addToBackStack(null)
+                .commit()
+    }
+
+    private fun generateBooks(): BookList {
+
         val bookList: BookList = BookList()
 
         val book1 = Book("Apples Never Fall", "Liane Moriarty")
@@ -33,10 +82,7 @@ class MainActivity : AppCompatActivity() {
         bookList.add(book9)
         bookList.add(book10)
 
-
-        supportFragmentManager.beginTransaction()
-            .add(R.id.listContainer, BookListFragment.newInstance(bookList))
-
+        return bookList
 
     }
 }
