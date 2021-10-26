@@ -1,3 +1,6 @@
 package edu.temple.audiobb
 
-data class Book (val title: String, val author: String)
+import android.os.Parcel
+import android.os.Parcelable
+
+data class Book (val title: String?, val author: String?)

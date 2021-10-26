@@ -11,7 +11,7 @@ class BookViewModel: ViewModel() {
         return bookLiveData
     }
 
-    fun setItem(book: Book){
+    fun setBook(book: Book){
         bookLiveData.value = book
     }
 }

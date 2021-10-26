@@ -8,8 +8,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.small_portrait)
 
-
-
         //create an instance of BookList class, populate with Book objects
         val bookList: BookList = BookList()
 
@@ -36,7 +34,8 @@ class MainActivity : AppCompatActivity() {
         bookList.add(book10)
 
 
-
+        supportFragmentManager.beginTransaction()
+            .add(R.id.listContainer, BookListFragment.newInstance(bookList))
 
 
     }

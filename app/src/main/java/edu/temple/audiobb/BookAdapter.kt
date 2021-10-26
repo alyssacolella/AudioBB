@@ -1,15 +1,12 @@
 package edu.temple.audiobb
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class BookAdapter (_books: ArrayList<Book>, _ocl: View.OnClickListener): RecyclerView.Adapter<BookAdapter.ViewHolder>() {
+class BookAdapter(_books: BookList, _ocl: View.OnClickListener): RecyclerView.Adapter<BookAdapter.ViewHolder>() {
 
     val books = _books
     val ocl = _ocl
@@ -25,11 +22,11 @@ class BookAdapter (_books: ArrayList<Book>, _ocl: View.OnClickListener): Recycle
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.view.findViewById<TextView>(R.id.bookName).text = books[position].title
-        holder.view.findViewById<TextView>(R.id.authorName).text = books[position].author
+        holder.view.findViewById<TextView>(R.id.bookName).text = books.get(position).title
+        holder.view.findViewById<TextView>(R.id.authorName).text = books.get(position).author
     }
 
     override fun getItemCount(): Int {
-        return books.size
+        return books.size()
     }
 }

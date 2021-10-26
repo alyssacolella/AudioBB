@@ -1,8 +1,15 @@
 package edu.temple.audiobb
 
-class BookList() {
+import android.os.Parcel
+import android.os.Parcelable
 
-    val list: MutableList<Book> = ArrayList()
+class BookList(): Parcelable {
+
+    lateinit var list: MutableList<Book>
+
+    constructor(parcel: Parcel) : this() {
+
+    }
 
     fun add(book: Book) {
         list.add(book)
@@ -13,11 +20,30 @@ class BookList() {
     }
 
     fun get(b: Int): Book {
-        return list[b + 1]
+        return list[b]
     }
 
     fun size(): Int {
         return list.size
     }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<BookList> {
+        override fun createFromParcel(parcel: Parcel): BookList {
+            return BookList(parcel)
+        }
+
+        override fun newArray(size: Int): Array<BookList?> {
+            return arrayOfNulls(size)
+        }
+    }
+
 
 }
