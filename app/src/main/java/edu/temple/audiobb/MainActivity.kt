@@ -2,47 +2,57 @@ package edu.temple.audiobb
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
 
 class MainActivity : AppCompatActivity(), BookListFragment.EventInterface {
 
-    var twoPane = false //default to small portrait
+    private var twoPane = false //default to small portrait
     lateinit var bookViewModel: BookViewModel
-    private var bookList: BookList? = null
+    lateinit var bookList: BookList
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        //create an instance of BookList class, populate with Book objects
+        bookList = generateBooks()
+        Log.d("books", bookList!![1].toString())
+        println("Books" + bookList[1].toString())
 
         //flag to determine if there are two fragment containers
         twoPane = findViewById<View>(R.id.container2) != null
 
         bookViewModel = ViewModelProvider(this).get(BookViewModel::class.java)
 
+        // Pop BookDetailsFragment from stack if a book was previously selected,
+        // but user has since cleared selection
         if(supportFragmentManager.findFragmentById(R.id.container1) is BookListFragment
             && bookViewModel.getBook().value == null)
                 supportFragmentManager.popBackStack()
 
+        // Remove redundant BookDetailsFragment if we're moving from single-pane mode
+        // (one container) to double pane mode (two containers) and a book has been selected
         if(supportFragmentManager.findFragmentById(R.id.container1) is BookListFragment
             && twoPane)
                 supportFragmentManager.popBackStack()
 
+        // If second container is available, place an instance of BookDetailsFragment
         if(twoPane) {
             if(supportFragmentManager.findFragmentById(R.id.container2) == null)
                 supportFragmentManager.beginTransaction()
                     .add(R.id.container2, BookDetailsFragment())
                     .commit()
-        }else if (bookViewModel.getBook().value != null){
+        }
+        // If moving to single-pane but a book was selected before the switch
+        else if (bookViewModel.getBook().value != null){
             supportFragmentManager.beginTransaction()
                 .add(R.id.container1, BookDetailsFragment())
                 .addToBackStack(null)
                 .commit()
         }
 
-
-        //create an instance of BookList class, populate with Book objects
-        bookList = generateBooks()
 
         supportFragmentManager.beginTransaction()
             .add(R.id.container1, BookListFragment.newInstance(bookList!!))

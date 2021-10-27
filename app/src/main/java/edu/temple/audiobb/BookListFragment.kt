@@ -1,6 +1,7 @@
 package edu.temple.audiobb
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -32,7 +33,7 @@ class BookListFragment : Fragment() {
         val layout = inflater.inflate(R.layout.fragment_book_list, container, false)
 
         val recyclerView = layout.findViewById<RecyclerView>(R.id.recyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(context)
+        recyclerView.layoutManager = LinearLayoutManager(activity)
 
         val bookViewModel = ViewModelProvider(requireActivity())
             .get(BookViewModel::class.java)

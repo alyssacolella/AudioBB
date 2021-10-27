@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 
 class BookAdapter(_books: BookList, _ocl: View.OnClickListener): RecyclerView.Adapter<BookAdapter.ViewHolder>() {
 
-    val books = _books
-    val ocl = _ocl
+    private val books = _books
+    private val ocl = _ocl
 
     class ViewHolder(_view: View, ocl: View.OnClickListener) : RecyclerView.ViewHolder(_view) {
         val view = _view.apply { setOnClickListener(ocl) }

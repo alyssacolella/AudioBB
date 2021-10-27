@@ -21,7 +21,7 @@ class BookList(): Parcelable {
         list.remove(book)
     }
 
-    fun get(b: Int): Book {
+    operator fun get(b: Int): Book {
         return list[b]
     }
 

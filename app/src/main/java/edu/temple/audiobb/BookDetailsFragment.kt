@@ -27,7 +27,6 @@ class BookDetailsFragment : Fragment() {
         return layout
     }
 
-
     private fun updateDisplay(book: Book){
         view?.findViewById<TextView>(R.id.selectedTitle)?.text = book.title
         view?.findViewById<TextView>(R.id.selectedAuthor)?.text = book.author

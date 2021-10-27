@@ -11,8 +11,8 @@
 
     <TextView
         android:id="@+id/selectedTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:textSize="26sp"
         app:layout_constraintBottom_toTopOf="@+id/selectedAuthor"
         app:layout_constraintEnd_toEndOf="parent"
@@ -23,8 +23,8 @@
 
     <TextView
         android:id="@+id/selectedAuthor"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
         android:layout_marginBottom="436dp"
         android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="parent"
