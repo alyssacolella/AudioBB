@@ -13,7 +13,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.EventInterface {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.small_portrait)
+        setContentView(R.layout.activity_main)
 
         //flag to determine if there are two fragment containers
         twoPane = findViewById<View>(R.id.container2) != null

@@ -5,7 +5,9 @@ import android.os.Parcelable
 
 class BookList(): Parcelable {
 
-    lateinit var list: MutableList<Book>
+    private val list: MutableList<Book> by lazy {
+        ArrayList()
+    }
 
     constructor(parcel: Parcel) : this() {
 
