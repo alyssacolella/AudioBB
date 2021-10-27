@@ -9,6 +9,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.EventInterface {
 
     var twoPane = false //default to small portrait
     lateinit var bookViewModel: BookViewModel
+    private var bookList: BookList? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,10 +42,10 @@ class MainActivity : AppCompatActivity(), BookListFragment.EventInterface {
 
 
         //create an instance of BookList class, populate with Book objects
-        val bookList = generateBooks()
+        bookList = generateBooks()
 
         supportFragmentManager.beginTransaction()
-            .add(R.id.container1, BookListFragment.newInstance(bookList))
+            .add(R.id.container1, BookListFragment.newInstance(bookList!!))
     }
 
     override fun selectionMade() {
@@ -58,7 +59,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.EventInterface {
 
     private fun generateBooks(): BookList {
 
-        val bookList: BookList = BookList()
+        val bookList = BookList()
 
         val book1 = Book("Apples Never Fall", "Liane Moriarty")
         val book2 = Book("Vince Flynn: Enemy at the Gates", "Kyle Mills")

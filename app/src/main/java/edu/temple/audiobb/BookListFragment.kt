@@ -20,7 +20,7 @@ class BookListFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            books = it.getParcelable<BookList>(ARG_PARAM1)!!
+            books = it.getParcelable(ARG_PARAM1)!!
         }
     }
 
