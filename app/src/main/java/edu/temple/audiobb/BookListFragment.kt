@@ -41,7 +41,7 @@ class BookListFragment : Fragment() {
 
         val onClickListener = View.OnClickListener {
             val bookPosition = recyclerView.getChildAdapterPosition(it)
-            bookViewModel.setBook(books.get(bookPosition))
+            bookViewModel.setBook(books[bookPosition])
             (activity as EventInterface).selectionMade()
         }
 

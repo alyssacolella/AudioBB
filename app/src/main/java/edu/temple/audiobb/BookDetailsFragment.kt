@@ -18,19 +18,31 @@ class BookDetailsFragment : Fragment() {
         // Inflate the layout for this fragment
         val layout = inflater.inflate(R.layout.fragment_book_details, container, false)
 
+//        ViewModelProvider(requireActivity())
+//            .get(BookViewModel:: class.java)
+//            .getBook()
+//            .observe(requireActivity()){
+//                updateDisplay(it)
+//            }
+
+        return layout
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         ViewModelProvider(requireActivity())
             .get(BookViewModel:: class.java)
             .getBook()
             .observe(requireActivity()){
                 updateDisplay(it)
             }
-
-        return layout
     }
 
     private fun updateDisplay(book: Book){
         view?.findViewById<TextView>(R.id.selectedTitle)?.text = book.title
         view?.findViewById<TextView>(R.id.selectedAuthor)?.text = book.author
+
 
         Log.d("SelectedTitle: ", book.title)
         Log.d("SelectedAuthor: ", book.author)

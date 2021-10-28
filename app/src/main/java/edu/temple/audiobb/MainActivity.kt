@@ -60,9 +60,6 @@ class MainActivity : AppCompatActivity(), BookListFragment.EventInterface {
                 .commit()
         }
 
-
-        supportFragmentManager.beginTransaction()
-            .add(R.id.container1, BookListFragment.newInstance(bookList!!))
     }
 
     override fun selectionMade() {

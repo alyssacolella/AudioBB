@@ -5,9 +5,9 @@
       <map>
         <entry key="app/src/main/res/layout-large/activity_main.xml" value="0.259765625" />
         <entry key="app/src/main/res/layout-large/tablet.xml" value="0.133984375" />
-        <entry key="app/src/main/res/layout-small-land/activity_main.xml" value="0.1" />
+        <entry key="app/src/main/res/layout-small-land/activity_main.xml" value="1.0" />
         <entry key="app/src/main/res/layout-small-land/small_landscape.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.14814814814814814" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.271875" />
         <entry key="app/src/main/res/layout/book_item.xml" value="0.3265625" />
         <entry key="app/src/main/res/layout/fragment_book_details.xml" value="0.3125" />
         <entry key="app/src/main/res/layout/fragment_book_list.xml" value="0.3125" />
