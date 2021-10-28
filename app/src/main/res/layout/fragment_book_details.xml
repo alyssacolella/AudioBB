@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/frameLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context=".BookDetailsFragment">
 
     <!-- TODO: Update blank fragment layout -->
@@ -12,20 +12,19 @@
     <TextView
         android:id="@+id/selectedTitle"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:textSize="26sp"
         app:layout_constraintBottom_toTopOf="@+id/selectedAuthor"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.428"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.8" />
+        app:layout_constraintVertical_bias="1.0" />
 
     <TextView
         android:id="@+id/selectedAuthor"
         android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginBottom="436dp"
+        android:layout_height="wrap_content"
         android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

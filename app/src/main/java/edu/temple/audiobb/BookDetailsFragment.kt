@@ -1,6 +1,7 @@
 package edu.temple.audiobb
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -30,6 +31,12 @@ class BookDetailsFragment : Fragment() {
     private fun updateDisplay(book: Book){
         view?.findViewById<TextView>(R.id.selectedTitle)?.text = book.title
         view?.findViewById<TextView>(R.id.selectedAuthor)?.text = book.author
+
+        Log.d("SelectedTitle: ", book.title)
+        Log.d("SelectedAuthor: ", book.author)
+
+        Log.d("Title: ", view?.findViewById<TextView>(R.id.selectedTitle)?.text.toString())
+        Log.d("Author: ", view?.findViewById<TextView>(R.id.selectedAuthor)?.text.toString())
     }
 
 }

@@ -16,11 +16,6 @@ class MainActivity : AppCompatActivity(), BookListFragment.EventInterface {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //create an instance of BookList class, populate with Book objects
-        bookList = generateBooks()
-        Log.d("books", bookList!![1].toString())
-        println("Books" + bookList[1].toString())
-
         //flag to determine if there are two fragment containers
         twoPane = findViewById<View>(R.id.container2) != null
 
@@ -37,6 +32,18 @@ class MainActivity : AppCompatActivity(), BookListFragment.EventInterface {
         if(supportFragmentManager.findFragmentById(R.id.container1) is BookListFragment
             && twoPane)
                 supportFragmentManager.popBackStack()
+
+
+        //create an instance of BookList class, populate with Book objects
+        bookList = generateBooks()
+
+        // If fragment was not previously loaded (first time starting activity)
+        // then add BookListFragment
+        if (savedInstanceState == null)
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.container1, BookListFragment.newInstance(bookList))
+                .commit()
+
 
         // If second container is available, place an instance of BookDetailsFragment
         if(twoPane) {
