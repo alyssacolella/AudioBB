@@ -1,29 +1,22 @@
 package edu.temple.audiobb
 
-import android.os.Parcel
-import android.os.Parcelable
 import java.io.Serializable
 
-class BookList(): Serializable {
-
-    private val list: MutableList<Book> by lazy {
+class BookList : Serializable{
+    private val bookList : MutableList<Book> by lazy {
         ArrayList()
     }
 
     fun add(book: Book) {
-        list.add(book)
+        bookList.add(book)
     }
 
-    fun remove(book: Book) {
-        list.remove(book)
+    fun remove(book: Book){
+        bookList.remove(book)
     }
 
-    operator fun get(b: Int): Book {
-        return list[b]
-    }
+    operator fun get(index: Int) = bookList[index]
 
-    fun size(): Int {
-        return list.size
-    }
+    fun size() = bookList.size
 
 }

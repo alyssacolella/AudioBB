@@ -2,102 +2,88 @@ package edu.temple.audiobb
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
 
-class MainActivity : AppCompatActivity(), BookListFragment.EventInterface {
+class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface {
 
-    private var twoPane = false //default to small portrait
-    lateinit var bookViewModel: BookViewModel
-    lateinit var bookList: BookList
+    val isSingleContainer : Boolean by lazy{
+        findViewById<View>(R.id.container2) == null
+    }
+
+    val selectedBookViewModel : SelectedBookViewModel by lazy {
+        ViewModelProvider(this).get(SelectedBookViewModel::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //flag to determine if there are two fragment containers
-        twoPane = findViewById<View>(R.id.container2) != null
+        // Grab test data
+        val bookList = getBookList()
 
-        bookViewModel = ViewModelProvider(this).get(BookViewModel::class.java)
+        // If we're switching from one container to two containers
+        // clear BookDetailsFragment from container1
+        if (supportFragmentManager.findFragmentById(R.id.container1) is BookDetailsFragment) {
+            supportFragmentManager.popBackStack()
+        }
 
-        // Pop BookDetailsFragment from stack if a book was previously selected,
-        // but user has since cleared selection
-        if(supportFragmentManager.findFragmentById(R.id.container1) is BookListFragment
-            && bookViewModel.getBook().value == null)
-                supportFragmentManager.popBackStack()
-
-        // Remove redundant BookDetailsFragment if we're moving from single-pane mode
-        // (one container) to double pane mode (two containers) and a book has been selected
-        if(supportFragmentManager.findFragmentById(R.id.container1) is BookListFragment
-            && twoPane)
-                supportFragmentManager.popBackStack()
-
-
-        //create an instance of BookList class, populate with Book objects
-        bookList = generateBooks()
-
-        // If fragment was not previously loaded (first time starting activity)
-        // then add BookListFragment
-        if (savedInstanceState == null)
+        // If this is the first time the activity is loading, go ahead and add a BookListFragment
+        if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.container1, BookListFragment.newInstance(bookList))
+                .add(R.id.container1, BookListFragment.newInstance(bookList))
                 .commit()
-
-
-        // If second container is available, place an instance of BookDetailsFragment
-        if(twoPane) {
-            if(supportFragmentManager.findFragmentById(R.id.container2) == null)
+        } else
+            // If activity loaded previously, there's already a BookListFragment
+            // If we have a single container and a selected book, place it on top
+            if (isSingleContainer && selectedBookViewModel.getSelectedBook().value != null) {
                 supportFragmentManager.beginTransaction()
-                    .add(R.id.container2, BookDetailsFragment())
+                    .replace(R.id.container1, BookDetailsFragment())
+                    .setReorderingAllowed(true)
+                    .addToBackStack(null)
                     .commit()
         }
-        // If moving to single-pane but a book was selected before the switch
-        else if (bookViewModel.getBook().value != null){
+
+        // If we have two containers but no BookDetailsFragment, add one to container2
+        if (!isSingleContainer && supportFragmentManager.findFragmentById(R.id.container2) !is BookDetailsFragment)
             supportFragmentManager.beginTransaction()
-                .add(R.id.container1, BookDetailsFragment())
+                .add(R.id.container2, BookDetailsFragment())
+                .commit()
+
+    }
+
+    private fun getBookList() : BookList {
+        val bookList = BookList()
+        bookList.add(Book("Book 0", "Author 9"))
+        bookList.add(Book("Book 1", "Author 8"))
+        bookList.add(Book("Book 2", "Author 7"))
+        bookList.add(Book("Book 3", "Author 6"))
+        bookList.add(Book("Book 4", "Author 5"))
+        bookList.add(Book("Book 5", "Author 4"))
+        bookList.add(Book("Book 6", "Author 3"))
+        bookList.add(Book("Book 7", "Author 3"))
+        bookList.add(Book("Book 8", "Author 2"))
+        bookList.add(Book("Book 9", "Author 0"))
+
+        return bookList
+    }
+
+    override fun onBackPressed() {
+        // Backpress clears the selected book
+        selectedBookViewModel.setSelectedBook(null)
+        super.onBackPressed()
+    }
+
+    override fun bookSelected() {
+        // Perform a fragment replacement if we only have a single container
+        // when a book is selected
+
+        if (isSingleContainer) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.container1, BookDetailsFragment())
+                .setReorderingAllowed(true)
                 .addToBackStack(null)
                 .commit()
         }
-
-    }
-
-    override fun selectionMade() {
-        // only respond if there is a single container
-        if (!twoPane)
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.container1, BookDetailsFragment())
-                .addToBackStack(null)
-                .commit()
-    }
-
-    private fun generateBooks(): BookList {
-
-        val bookList = BookList()
-
-        val book1 = Book("Apples Never Fall", "Liane Moriarty")
-        val book2 = Book("Vince Flynn: Enemy at the Gates", "Kyle Mills")
-        val book3 = Book("Harlem Shuffle", "Colson Whitehead")
-        val book4 = Book("Beautiful World, Where are You", "Sally Rooney")
-        val book5 = Book("It Ends with Us", "Colleen Hoover")
-        val book6 = Book("American Marxism", "Mark R. Levin")
-        val book7 = Book("Unbound", "Tarana Burke")
-        val book8 = Book("Fuzz", "Mary Roach")
-        val book9 = Book("The Seven Husbands of Evelyn Hugo", "Taylor Jenkins Reid")
-        val book10 = Book("Where the Crawdads Sing", "Delia Owens")
-
-        bookList.add(book1)
-        bookList.add(book2)
-        bookList.add(book3)
-        bookList.add(book4)
-        bookList.add(book5)
-        bookList.add(book6)
-        bookList.add(book7)
-        bookList.add(book8)
-        bookList.add(book9)
-        bookList.add(book10)
-
-        return bookList
-
     }
 }
