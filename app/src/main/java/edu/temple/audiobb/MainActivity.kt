@@ -1,6 +1,5 @@
 package edu.temple.audiobb
 
-import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -26,9 +25,9 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         // Grab test data
         val bookList = getBookList()
 
-        val searchBoxButton: Button = findViewById(R.id.searchBoxButton)
+        val mainSearchButton: Button = findViewById(R.id.mainSearchButton)
 
-        searchBoxButton.setOnClickListener(){
+        mainSearchButton.setOnClickListener(){
             val builder = AlertDialog.Builder(this)
             val inflater = this.layoutInflater
             builder.setView(inflater.inflate(R.layout.activity_book_search, null))
@@ -68,7 +67,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
 
     private fun getBookList() : BookList {
         val bookList = BookList()
-        val book1 = Book("the", "me", 1, "https://kamorris.com/lab/abp/covers/through_the_looking_glass.jpeg")
+        val book1 = Book(1, "the", "me", "https://kamorris.com/lab/abp/covers/through_the_looking_glass.jpeg")
         bookList.add(book1)
 
         return bookList

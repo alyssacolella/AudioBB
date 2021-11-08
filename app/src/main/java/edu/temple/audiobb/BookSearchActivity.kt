@@ -9,7 +9,6 @@ import android.widget.Toast
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.JsonArrayRequest
-import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONException
 import org.json.JSONObject
@@ -24,12 +23,12 @@ class BookSearchActivity : AppCompatActivity() {
         findViewById(R.id.searchEditTextView)
     }
 
-    val cancelButton: Button by lazy {
-        findViewById(R.id.cancelButton)
+    val dialogCancelButton: Button by lazy {
+        findViewById(R.id.dialogCancelButton)
     }
 
-    val searchButton: Button by lazy {
-        findViewById(R.id.searchButton)
+    val dialogSearchButton: Button by lazy {
+        findViewById(R.id.dialogSearchButton)
     }
 
 
@@ -37,10 +36,10 @@ class BookSearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_book_search)
 
-        searchButton.setOnClickListener{
-            fetchBooks(searchEditTextView.text.toString())
+        dialogSearchButton.setOnClickListener{
+            val booksToDisplay = fetchBooks(searchEditTextView.text.toString())
+            Log.d("Result book: ", booksToDisplay.toString())
         }
-
 
     }
 
@@ -65,11 +64,9 @@ class BookSearchActivity : AppCompatActivity() {
                             val imageUrl: String = book.getString("cover_url")
 
                             bookListReturned.add(Book(id, title, author, imageUrl))
+                            Log.d("Book item log: ", bookListReturned[i].toString())
 
                         }
-
-
-
                     } catch (e : JSONException) {
                         e.printStackTrace()
                     }
