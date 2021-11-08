@@ -3,6 +3,7 @@ package edu.temple.audiobb
 import android.app.Activity
 import android.app.Dialog
 import android.content.DialogInterface
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +11,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
 import com.android.volley.Request
@@ -29,36 +31,33 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         ViewModelProvider(this).get(SelectedBookViewModel::class.java)
     }
 
-    val volleyQueue : RequestQueue by lazy {
-        Volley.newRequestQueue(this)
+    lateinit var resultBookList: BookList
+
+    val searchActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+        result -> if(result.resultCode == Activity.RESULT_OK){
+            resultBookList = result.data?.getSerializableExtra("bookList") as BookList
+        }
     }
-
-    var bookListReturned = BookList()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Grab test data
-        val bookList = getBookList()
+        val searchActivityIntent = Intent(this, BookSearchActivity::class.java)
 
-        val mainSearchButton: Button = findViewById(R.id.mainSearchButton)
-
-        mainSearchButton.setOnClickListener {
-            val dialog = Dialog(this)
-            dialog.setTitle("Search")
-            dialog.setContentView(R.layout.activity_book_search)
-            val searchEditTextView = dialog.findViewById<TextView>(R.id.searchEditTextView)
-
-            val dialogSearchButton = dialog.findViewById<Button>(R.id.dialogSearchButton)
-            dialogSearchButton.setOnClickListener{
-                val booksToDisplay = fetchBooks(searchEditTextView.text.toString())
-                Log.d("Result book: ", booksToDisplay.toString())
-                Log.d("Search text: ", searchEditTextView.text.toString())
-            }
-            dialog.show()
+        findViewById<Button>(R.id.mainSearchButton).setOnClickListener{
+            startActivity(searchActivityIntent)
         }
+
+//        mainSearchButton.setOnClickListener {
+//            val dialog = Dialog(this)
+//            dialog.setTitle("Search")
+//            dialog.setContentView(R.layout.activity_book_search)
+//            dialog.show()
+//        }
+
+        findViewById<Button>(R.id.dialogSearchButton).setOnClickListener()
+
 
         // If we're switching from one container to two containers
         // clear BookDetailsFragment from container1
@@ -69,7 +68,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         // If this is the first time the activity is loading, go ahead and add a BookListFragment
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .add(R.id.container1, BookListFragment.newInstance(bookList))
+                .add(R.id.container1, BookListFragment.newInstance(resultBookList))
                 .commit()
         } else
             // If activity loaded previously, there's already a BookListFragment
@@ -90,14 +89,6 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
 
     }
 
-    private fun getBookList() : BookList {
-        val bookList = BookList()
-        val book1 = Book(1, "the", "me", "https://kamorris.com/lab/abp/covers/through_the_looking_glass.jpeg")
-        bookList.add(book1)
-
-        return bookList
-    }
-
     override fun onBackPressed() {
         // Backpress clears the selected book
         selectedBookViewModel.setSelectedBook(null)
@@ -116,39 +107,4 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
                 .commit()
         }
     }
-
-    fun fetchBooks(searchText: String): BookList {
-        val url =  "https://kamorris.com/lab/cis3515/search.php?term=" + searchText
-
-        volleyQueue.add (
-            JsonArrayRequest(Request.Method.GET
-                , url
-                , null
-                , {
-                        response ->
-                    try {
-                        for(i in 0 until response.length()){
-                            val book: JSONObject = response.getJSONObject(i)
-
-                            val id: Int = book.getInt("id")
-                            val title: String = book.getString("title")
-                            val author: String = book.getString("author")
-                            val imageUrl: String = book.getString("cover_url")
-
-                            bookListReturned.add(Book(id, title, author, imageUrl))
-                            Log.d("Book item log: ", bookListReturned[i].toString())
-
-                        }
-                    } catch (e : JSONException) {
-                        e.printStackTrace()
-                    }
-                }
-                , {
-                    Toast.makeText(this, "Error!", Toast.LENGTH_SHORT).show()
-                })
-        )
-
-        return bookListReturned
-    }
-
 }

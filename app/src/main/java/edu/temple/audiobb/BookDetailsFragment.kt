@@ -43,4 +43,7 @@ class BookDetailsFragment : Fragment() {
             Picasso.get().load(coverURL).into(bookImageView)
         }
     }
+
+
+
 }
