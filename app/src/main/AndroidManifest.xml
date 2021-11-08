@@ -10,6 +10,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AudioBB">
         <activity
+            android:name=".BookSearchActivity"
+            android:exported="true"
+            android:theme="@android:style/Theme.Holo.Dialog"/>
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

@@ -1,8 +1,11 @@
 package edu.temple.audiobb
 
+import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
 
 class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface {
@@ -15,12 +18,33 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         ViewModelProvider(this).get(SelectedBookViewModel::class.java)
     }
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         // Grab test data
         val bookList = getBookList()
+
+        val searchBoxButton: Button = findViewById(R.id.searchBoxButton)
+        searchBoxButton.setOnClickListener(){
+            //setContentView(R.layout.activity_book_search)
+            //View.inflate(this, R.layout.activity_book_search, null)
+
+            val builder = AlertDialog.Builder(this)
+            val inflater = this.layoutInflater
+            builder.setView(inflater.inflate(R.layout.activity_book_search, null))
+                .setPositiveButton(R.string.search,
+                    DialogInterface.OnClickListener{ dialog, id ->
+                    //run search
+                })
+                .setNegativeButton(R.string.cancel,
+                    DialogInterface.OnClickListener{ dialog, id ->
+                        //cancel dialog
+                })
+            builder.create()
+            builder.show()
+        }
 
         // If we're switching from one container to two containers
         // clear BookDetailsFragment from container1
