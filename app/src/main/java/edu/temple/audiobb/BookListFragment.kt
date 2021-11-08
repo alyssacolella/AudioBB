@@ -33,7 +33,7 @@ class BookListFragment : Fragment() {
         val layout = inflater.inflate(R.layout.fragment_book_list, container, false)
 
         val recyclerView = layout.findViewById<RecyclerView>(R.id.recyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(activity)
+        recyclerView.layoutManager = LinearLayoutManager(requireActivity())
 
         val bookViewModel = ViewModelProvider(requireActivity())
             .get(BookViewModel::class.java)
@@ -55,7 +55,7 @@ class BookListFragment : Fragment() {
         fun newInstance(param1: BookList) =
             BookListFragment().apply {
                 arguments = Bundle().apply {
-                    putParcelable(ARG_PARAM1, param1)
+                    putSerializable(ARG_PARAM1, param1)
                 }
             }
     }
