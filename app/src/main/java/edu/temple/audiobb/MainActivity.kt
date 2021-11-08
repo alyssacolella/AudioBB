@@ -27,21 +27,11 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         val bookList = getBookList()
 
         val searchBoxButton: Button = findViewById(R.id.searchBoxButton)
-        searchBoxButton.setOnClickListener(){
-            //setContentView(R.layout.activity_book_search)
-            //View.inflate(this, R.layout.activity_book_search, null)
 
+        searchBoxButton.setOnClickListener(){
             val builder = AlertDialog.Builder(this)
             val inflater = this.layoutInflater
             builder.setView(inflater.inflate(R.layout.activity_book_search, null))
-                .setPositiveButton(R.string.search,
-                    DialogInterface.OnClickListener{ dialog, id ->
-                    //run search
-                })
-                .setNegativeButton(R.string.cancel,
-                    DialogInterface.OnClickListener{ dialog, id ->
-                        //cancel dialog
-                })
             builder.create()
             builder.show()
         }
@@ -78,6 +68,8 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
 
     private fun getBookList() : BookList {
         val bookList = BookList()
+        val book1 = Book("the", "me", 1, "https://kamorris.com/lab/abp/covers/through_the_looking_glass.jpeg")
+        bookList.add(book1)
 
         return bookList
     }
