@@ -23,9 +23,7 @@ import org.json.JSONObject
 
 class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface {
 
-    val isSingleContainer : Boolean by lazy{
-        findViewById<View>(R.id.container2) == null
-    }
+    var isTwoPane = false
 
     val selectedBookViewModel : SelectedBookViewModel by lazy {
         ViewModelProvider(this).get(SelectedBookViewModel::class.java)
@@ -36,6 +34,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
     val searchActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
         result -> if(result.resultCode == Activity.RESULT_OK){
             resultBookList = result.data?.getSerializableExtra("bookList") as BookList
+            Log.d("Result Book List",  resultBookList.toString())
         }
     }
 
@@ -43,20 +42,14 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        isTwoPane = findViewById<View>(R.id.container2) == null
         val searchActivityIntent = Intent(this, BookSearchActivity::class.java)
 
         findViewById<Button>(R.id.mainSearchButton).setOnClickListener{
             startActivity(searchActivityIntent)
         }
 
-//        mainSearchButton.setOnClickListener {
-//            val dialog = Dialog(this)
-//            dialog.setTitle("Search")
-//            dialog.setContentView(R.layout.activity_book_search)
-//            dialog.show()
-//        }
-
-        findViewById<Button>(R.id.dialogSearchButton).setOnClickListener()
+        //findViewById<Button>(R.id.dialogSearchButton).setOnClickListener{searchActivityLauncher.launch(searchActivityIntent)}
 
 
         // If we're switching from one container to two containers
@@ -73,7 +66,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         } else
             // If activity loaded previously, there's already a BookListFragment
             // If we have a single container and a selected book, place it on top
-            if (isSingleContainer && selectedBookViewModel.getSelectedBook().value != null) {
+            if (isTwoPane && selectedBookViewModel.getSelectedBook().value != null) {
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.container1, BookDetailsFragment())
                     .setReorderingAllowed(true)
@@ -82,7 +75,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         }
 
         // If we have two containers but no BookDetailsFragment, add one to container2
-        if (!isSingleContainer && supportFragmentManager.findFragmentById(R.id.container2) !is BookDetailsFragment)
+        if (!isTwoPane && supportFragmentManager.findFragmentById(R.id.container2) !is BookDetailsFragment)
             supportFragmentManager.beginTransaction()
                 .add(R.id.container2, BookDetailsFragment())
                 .commit()
@@ -99,7 +92,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         // Perform a fragment replacement if we only have a single container
         // when a book is selected
 
-        if (isSingleContainer) {
+        if (isTwoPane) {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.container1, BookDetailsFragment())
                 .setReorderingAllowed(true)
