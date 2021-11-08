@@ -21,11 +21,24 @@
         android:id="@+id/authorTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="111dp"
+        android:layout_marginTop="32dp"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.052"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/titleTextView"
         tools:text="book author" />
+
+    <ImageView
+        android:id="@+id/bookImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.056"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/authorTextView"
+        app:layout_constraintVertical_bias="0.066"
+        tools:src="@tools:sample/avatars" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

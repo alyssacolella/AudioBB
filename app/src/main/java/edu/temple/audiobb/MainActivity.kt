@@ -54,16 +54,6 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
 
     private fun getBookList() : BookList {
         val bookList = BookList()
-        bookList.add(Book("Book 0", "Author 9"))
-        bookList.add(Book("Book 1", "Author 8"))
-        bookList.add(Book("Book 2", "Author 7"))
-        bookList.add(Book("Book 3", "Author 6"))
-        bookList.add(Book("Book 4", "Author 5"))
-        bookList.add(Book("Book 5", "Author 4"))
-        bookList.add(Book("Book 6", "Author 3"))
-        bookList.add(Book("Book 7", "Author 3"))
-        bookList.add(Book("Book 8", "Author 2"))
-        bookList.add(Book("Book 9", "Author 0"))
 
         return bookList
     }
