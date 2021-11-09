@@ -21,6 +21,8 @@ class BookSearchActivity : AppCompatActivity() {
         Volley.newRequestQueue(this)
     }
 
+    val bookListReturned = BookList()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_book_search)
@@ -33,20 +35,17 @@ class BookSearchActivity : AppCompatActivity() {
         val dialogSearchButton = findViewById<Button>(R.id.dialogSearchButton)
         dialogSearchButton.setOnClickListener{
 
-            resultIntent.putExtra("bookList", fetchBooks(searchEditTextView.text.toString()))
+            val books = fetchBooks(searchEditTextView.text.toString())
+            Log.d("Books", books.toString())
+            resultIntent.putExtra("bookList", books)
             setResult(RESULT_OK, resultIntent)
             finish()
-
-            //Log.d("Result book: ", booksToDisplay.toString())
-            //Log.d("Search text: ", searchEditTextView.text.toString())
         }
 
     }
 
     fun fetchBooks(searchText: String): BookList {
         val url =  "https://kamorris.com/lab/cis3515/search.php?term=" + searchText
-
-        var bookListReturned = BookList()
 
         volleyQueue.add (
             JsonArrayRequest(Request.Method.GET
@@ -64,8 +63,6 @@ class BookSearchActivity : AppCompatActivity() {
                             val imageUrl: String = book.getString("cover_url")
 
                             bookListReturned.add(Book(id, title, author, imageUrl))
-                            Log.d("Book item log: ", bookListReturned[i].toString())
-
                         }
                     } catch (e : JSONException) {
                         e.printStackTrace()
@@ -75,7 +72,7 @@ class BookSearchActivity : AppCompatActivity() {
                     Toast.makeText(this, "Error!", Toast.LENGTH_SHORT).show()
                 })
         )
-
+        Log.d("BookListReturned ", bookListReturned.toString())
         return bookListReturned
     }
 

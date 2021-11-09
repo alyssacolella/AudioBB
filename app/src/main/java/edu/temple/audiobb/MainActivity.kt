@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         ViewModelProvider(this).get(SelectedBookViewModel::class.java)
     }
 
-    lateinit var resultBookList: BookList
+    var resultBookList = BookList()
 
 
     private val searchActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
@@ -50,8 +50,9 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
             Log.d("Search Activity Launched", resultBookList.toString())
         }
 
-        if(this::resultBookList.isInitialized) {
+        //if(this::resultBookList.isInitialized) {
 
+            Log.d("Book list after if statement", resultBookList.toString())
             // If we're switching from one container to two containers
             // clear BookDetailsFragment from container1
             if (supportFragmentManager.findFragmentById(R.id.container1) is BookDetailsFragment) {
@@ -79,7 +80,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
                 supportFragmentManager.beginTransaction()
                     .add(R.id.container2, BookDetailsFragment())
                     .commit()
-        }
+       //}
     }
 
     override fun onBackPressed() {
