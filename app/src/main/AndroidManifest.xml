@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AudioBB">
         <activity
-            android:theme="@style/Theme.AppCompat.Dialog"
+            android:theme="@style/SearchDialog"
             android:name=".BookSearchActivity"
             android:label="Search"
             android:exported="true"/>
