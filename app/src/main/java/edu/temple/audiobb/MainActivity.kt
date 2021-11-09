@@ -31,7 +31,6 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
 
     lateinit var resultBookList: BookList
 
-    //var resultBookList = BookList()
 
     private val searchActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
         result -> if(result.resultCode == Activity.RESULT_OK){
@@ -48,10 +47,8 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
 
         findViewById<Button>(R.id.mainSearchButton).setOnClickListener{
             searchActivityLauncher.launch(Intent(this, BookSearchActivity::class.java))
+            Log.d("Search Activity Launched", resultBookList.toString())
         }
-
-        findViewById<Button>(R.id.dialogSearchButton).setOnClickListener{
-            searchActivityLauncher.launch(Intent(this, BookSearchActivity::class.java))}
 
         if(this::resultBookList.isInitialized) {
 
