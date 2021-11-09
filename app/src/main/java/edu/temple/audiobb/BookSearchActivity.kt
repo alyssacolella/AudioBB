@@ -14,6 +14,7 @@ import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.Serializable
 
 class BookSearchActivity : AppCompatActivity() {
 
@@ -27,7 +28,7 @@ class BookSearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_book_search)
 
-        val resultIntent = Intent().putExtra("bookList", BookList())
+        val resultIntent = Intent().putExtra("bookList", BookList() as Serializable)
         setResult(RESULT_OK, resultIntent)
 
         val searchEditTextView = findViewById<TextView>(R.id.searchEditTextView)
@@ -37,7 +38,7 @@ class BookSearchActivity : AppCompatActivity() {
 
             val books = fetchBooks(searchEditTextView.text.toString())
             Log.d("Books", books.toString())
-            resultIntent.putExtra("bookList", books)
+            resultIntent.putExtra("bookList", books as Serializable)
             setResult(RESULT_OK, resultIntent)
             finish()
         }
