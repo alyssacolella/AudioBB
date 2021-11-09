@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         ViewModelProvider(this).get(SelectedBookViewModel::class.java)
     }
 
-    lateinit var resultBookList: BookList
+    var resultBookList = BookList()
 
     val searchActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
         result -> if(result.resultCode == Activity.RESULT_OK){
