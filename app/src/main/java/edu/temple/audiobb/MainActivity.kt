@@ -25,16 +25,23 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
 
     var isTwoPane = false
 
-    var bookList = BookList()
+    //var bookList = BookList()
     private val selectedBookViewModel : SelectedBookViewModel by lazy {
         ViewModelProvider(this).get(SelectedBookViewModel::class.java)
+    }
+
+    private val bookListModel : BookList by lazy {
+        ViewModelProvider(this).get(BookList::class.java)
     }
 
     private val searchActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
         supportFragmentManager.popBackStack()
         it.data?.run {
-            bookList.copyBooks(getSerializableExtra("books") as BookList)
-            Log.d("BookList in activity launcher", bookList.toString())
+//            bookList.copyBooks(getSerializableExtra("books") as BookList)
+//            Log.d("BookList in activity launcher", bookList.toString())
+
+            bookListModel.copyBooks(getSerializableExtra("books") as BookList)
+            Log.d("BookList in activity launcher", bookListModel.toString())
         }
     }
 
@@ -53,7 +60,8 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         // If this is the first time the activity is loading, go ahead and add a BookListFragment
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .add(R.id.container1, BookListFragment.newInstance(bookList))
+//                .add(R.id.container1, BookListFragment.newInstance(bookList))
+                .add(R.id.container1, BookListFragment.newInstance(bookListModel))
                 .commit()
         } else
         // If activity loaded previously, there's already a BookListFragment

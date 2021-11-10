@@ -27,11 +27,12 @@ class BookSearchActivity : AppCompatActivity() {
                 JsonArrayRequest(Request.Method.GET, url, null, {
                   setResult(RESULT_OK,
                       Intent().putExtra("books", BookList().apply { fillBookList(it) }))
+                    Log.d("BookList from volley request", it.toString())
                     finish()
                 },
                     {}))
 
-            Log.d("BookList from volley request", it.toString())
+
         }
     }
 }
