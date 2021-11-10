@@ -24,15 +24,18 @@ import org.json.JSONObject
 class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface {
 
     var isTwoPane = false
-    var resultBookList = BookList()
+    var bookList = BookList()
+    var bookListToPass = BookList()
     val selectedBookViewModel : SelectedBookViewModel by lazy {
         ViewModelProvider(this).get(SelectedBookViewModel::class.java)
     }
 
     private val searchActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
         result -> if(result.resultCode == Activity.RESULT_OK){
-            resultBookList = result.data?.getSerializableExtra("bookList") as BookList
-            Log.d("Result Book List",  resultBookList.toString())
+            bookList = result.data?.getSerializableExtra("bookList") as BookList
+            //bookListToPass.copyBooks(bookList)
+            Log.d("Result Book List", bookList.toString())
+            //Log.d("Result Book List to Pass", bookListToPass.toString())
         }
     }
 
@@ -50,7 +53,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         // If this is the first time the activity is loading, go ahead and add a BookListFragment
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .add(R.id.container1, BookListFragment.newInstance(resultBookList))
+                .add(R.id.container1, BookListFragment.newInstance(bookList))
                 .commit()
         } else
         // If activity loaded previously, there's already a BookListFragment

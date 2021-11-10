@@ -1,6 +1,5 @@
 package edu.temple.audiobb
 
-import android.app.Dialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -22,7 +21,8 @@ class BookSearchActivity : AppCompatActivity() {
         Volley.newRequestQueue(this)
     }
 
-    val bookListReturned = BookList()
+    var bookList = BookList()
+    val newBooks = BookList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,16 +36,17 @@ class BookSearchActivity : AppCompatActivity() {
         val dialogSearchButton = findViewById<Button>(R.id.dialogSearchButton)
         dialogSearchButton.setOnClickListener{
 
-            val books = fetchBooks(searchEditTextView.text.toString())
-            Log.d("Books", books.toString())
-            resultIntent.putExtra("bookList", books as Serializable)
+            fetchBooks(searchEditTextView.text.toString(), bookList)
+            Log.d("Books", bookList.toString())
+            Log.d("Book Item 1", bookList.get(0).toString()) //error because array is empty
+            resultIntent.putExtra("bookList", bookList as Serializable)
             setResult(RESULT_OK, resultIntent)
             finish()
         }
 
     }
 
-    fun fetchBooks(searchText: String): BookList {
+    fun fetchBooks(searchText: String, books: BookList){
         val url =  "https://kamorris.com/lab/cis3515/search.php?term=" + searchText
 
         volleyQueue.add (
@@ -63,8 +64,13 @@ class BookSearchActivity : AppCompatActivity() {
                             val author: String = book.getString("author")
                             val imageUrl: String = book.getString("cover_url")
 
-                            bookListReturned.add(Book(id, title, author, imageUrl))
+
+                            books.add(Book(id, title, author, imageUrl))
+
+                            Log.d("Book just added", books.get(i).toString())
+                            Log.d("Updated Book List ", bookList.toString())
                         }
+
                     } catch (e : JSONException) {
                         e.printStackTrace()
                     }
@@ -73,8 +79,6 @@ class BookSearchActivity : AppCompatActivity() {
                     Toast.makeText(this, "Error!", Toast.LENGTH_SHORT).show()
                 })
         )
-        Log.d("BookListReturned ", bookListReturned.toString())
-        return bookListReturned
     }
 
 }

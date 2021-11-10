@@ -19,4 +19,8 @@ class BookList : Serializable{
 
     fun size() = bookList.size
 
+    fun copyBooks(newBooks: BookList){
+        bookList.clear()
+        bookList.addAll(newBooks.bookList)
+    }
 }
