@@ -17,18 +17,20 @@ import java.io.Serializable
 
 class BookSearchActivity : AppCompatActivity() {
 
-    val volleyQueue : RequestQueue by lazy {
+    private val volleyQueue : RequestQueue by lazy {
         Volley.newRequestQueue(this)
     }
 
-    var bookList = BookList()
-    val newBooks = BookList()
+    private var bookList = BookList()
+    //private var bookList: BookList? = null
+
+    //val resultIntent = Intent().putExtra("books", BookList() as Serializable)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_book_search)
 
-        val resultIntent = Intent().putExtra("bookList", BookList() as Serializable)
+        val resultIntent = Intent().putExtra("books", BookList() as Serializable)
         setResult(RESULT_OK, resultIntent)
 
         val searchEditTextView = findViewById<TextView>(R.id.searchEditTextView)
@@ -37,38 +39,36 @@ class BookSearchActivity : AppCompatActivity() {
         dialogSearchButton.setOnClickListener{
 
             fetchBooks(searchEditTextView.text.toString(), bookList)
+            resultIntent.putExtra("books", bookList as Serializable)
+
             Log.d("Books", bookList.toString())
-            Log.d("Book Item 1", bookList.get(0).toString()) //error because array is empty
-            resultIntent.putExtra("bookList", bookList as Serializable)
+
+
             setResult(RESULT_OK, resultIntent)
             finish()
         }
-
     }
 
     fun fetchBooks(searchText: String, books: BookList){
         val url =  "https://kamorris.com/lab/cis3515/search.php?term=" + searchText
 
+        books.copyBooks(books)
         volleyQueue.add (
             JsonArrayRequest(Request.Method.GET
                 , url
                 , null
                 , {
-                        response ->
+                    Log.d("Response", it.toString())
                     try {
-                        for(i in 0 until response.length()){
-                            val book: JSONObject = response.getJSONObject(i)
+                        for(i in 0 until it.length()){
+                            val book: JSONObject = it.getJSONObject(i)
 
-                            val id: Int = book.getInt("id")
-                            val title: String = book.getString("title")
-                            val author: String = book.getString("author")
-                            val imageUrl: String = book.getString("cover_url")
+                            books.add(Book(book.getInt("id"),
+                                book.getString("title"),
+                                book.getString("author"),
+                                book.getString("cover_url")))
 
-
-                            books.add(Book(id, title, author, imageUrl))
-
-                            Log.d("Book just added", books.get(i).toString())
-                            Log.d("Updated Book List ", bookList.toString())
+                            Log.d("Book added", books.get(i).toString())
                         }
 
                     } catch (e : JSONException) {

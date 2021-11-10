@@ -24,19 +24,15 @@ import org.json.JSONObject
 class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface {
 
     var isTwoPane = false
-    var bookList = BookList()
-    var bookListToPass = BookList()
-    val selectedBookViewModel : SelectedBookViewModel by lazy {
+    //private var bookList = BookList()
+    lateinit var bookList: BookList
+    private val selectedBookViewModel : SelectedBookViewModel by lazy {
         ViewModelProvider(this).get(SelectedBookViewModel::class.java)
     }
 
     private val searchActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
-        result -> if(result.resultCode == Activity.RESULT_OK){
-            bookList = result.data?.getSerializableExtra("bookList") as BookList
-            //bookListToPass.copyBooks(bookList)
+            bookList = it.data?.getSerializableExtra("books") as BookList
             Log.d("Result Book List", bookList.toString())
-            //Log.d("Result Book List to Pass", bookListToPass.toString())
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,38 +41,43 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
 
         isTwoPane = findViewById<View>(R.id.container2) == null
 
+        val searchActivityIntent = Intent(this, BookSearchActivity::class.java)
+
         findViewById<Button>(R.id.mainSearchButton).setOnClickListener{
-            searchActivityLauncher.launch(Intent(this, BookSearchActivity::class.java))
+            searchActivityLauncher.launch(searchActivityIntent)
             Log.d("Main Search Btn Clicked", "Search Activity Launched")
         }
 
-        // If this is the first time the activity is loading, go ahead and add a BookListFragment
-        if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction()
-                .add(R.id.container1, BookListFragment.newInstance(bookList))
-                .commit()
-        } else
-        // If activity loaded previously, there's already a BookListFragment
-        // If we have a single container and a selected book, place it on top
-            if (isTwoPane && selectedBookViewModel.getSelectedBook().value != null) {
+        if(this::bookList.isInitialized) {
+            // If this is the first time the activity is loading, go ahead and add a BookListFragment
+            if (savedInstanceState == null) {
                 supportFragmentManager.beginTransaction()
-                    .replace(R.id.container1, BookDetailsFragment())
-                    .setReorderingAllowed(true)
-                    .addToBackStack(null)
+                    .add(R.id.container1, BookListFragment.newInstance(bookList))
                     .commit()
+            } else
+            // If activity loaded previously, there's already a BookListFragment
+            // If we have a single container and a selected book, place it on top
+                if (isTwoPane && selectedBookViewModel.getSelectedBook().value != null) {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.container1, BookDetailsFragment())
+                        .setReorderingAllowed(true)
+                        .addToBackStack(null)
+                        .commit()
+                }
+
+            // If we're switching from one container to two containers
+            // clear BookDetailsFragment from container1
+            if (supportFragmentManager.findFragmentById(R.id.container1) is BookDetailsFragment) {
+                supportFragmentManager.popBackStack()
             }
 
-        // If we're switching from one container to two containers
-        // clear BookDetailsFragment from container1
-        if (supportFragmentManager.findFragmentById(R.id.container1) is BookDetailsFragment) {
-            supportFragmentManager.popBackStack()
-        }
+            // If we have two containers but no BookDetailsFragment, add one to container2
+            if (!isTwoPane && supportFragmentManager.findFragmentById(R.id.container2) !is BookDetailsFragment)
+                supportFragmentManager.beginTransaction()
+                    .add(R.id.container2, BookDetailsFragment())
+                    .commit()
 
-        // If we have two containers but no BookDetailsFragment, add one to container2
-        if (!isTwoPane && supportFragmentManager.findFragmentById(R.id.container2) !is BookDetailsFragment)
-            supportFragmentManager.beginTransaction()
-                .add(R.id.container2, BookDetailsFragment())
-                .commit()
+        }
     }
 
     override fun onBackPressed() {
