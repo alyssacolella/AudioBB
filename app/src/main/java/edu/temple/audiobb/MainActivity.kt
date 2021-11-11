@@ -1,29 +1,17 @@
 package edu.temple.audiobb
 
-import android.app.Activity
-import android.app.Dialog
-import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
-import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
-import com.android.volley.Request
-import com.android.volley.RequestQueue
-import com.android.volley.toolbox.JsonArrayRequest
-import com.android.volley.toolbox.Volley
-import org.json.JSONException
-import org.json.JSONObject
 
 class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface {
 
-    var isTwoPane = false
+    private var isTwoPane = false
 
     //var bookList = BookList()
     private val selectedBookViewModel : SelectedBookViewModel by lazy {
@@ -37,11 +25,10 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
     private val searchActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
         supportFragmentManager.popBackStack()
         it.data?.run {
-//            bookList.copyBooks(getSerializableExtra("books") as BookList)
-//            Log.d("BookList in activity launcher", bookList.toString())
-
             bookListModel.copyBooks(getSerializableExtra("books") as BookList)
+            BookListFragment.bookListUpdated()
             Log.d("BookList in activity launcher", bookListModel.toString())
+            Log.d("BookList item 1 in activity launcher", bookListModel.get(0).toString())
         }
     }
 
@@ -53,6 +40,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
 
         val searchActivityIntent = Intent(this, BookSearchActivity::class.java)
 
+
         findViewById<Button>(R.id.mainSearchButton).setOnClickListener{
             searchActivityLauncher.launch(searchActivityIntent)
         }
@@ -60,7 +48,6 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         // If this is the first time the activity is loading, go ahead and add a BookListFragment
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-//                .add(R.id.container1, BookListFragment.newInstance(bookList))
                 .add(R.id.container1, BookListFragment.newInstance(bookListModel))
                 .commit()
         } else
@@ -85,8 +72,6 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
             supportFragmentManager.beginTransaction()
                 .add(R.id.container2, BookDetailsFragment())
                 .commit()
-
-
     }
 
     override fun onBackPressed() {
@@ -107,4 +92,5 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
                 .commit()
         }
     }
+
 }

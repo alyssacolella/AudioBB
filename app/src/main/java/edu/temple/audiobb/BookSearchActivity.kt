@@ -31,8 +31,6 @@ class BookSearchActivity : AppCompatActivity() {
                     finish()
                 },
                     {}))
-
-
         }
     }
 }

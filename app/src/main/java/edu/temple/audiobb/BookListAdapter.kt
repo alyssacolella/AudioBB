@@ -8,8 +8,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class BookListAdapter (_bookList: BookList, _onClick: (Book) -> Unit) : RecyclerView.Adapter<BookListAdapter.BookViewHolder>() {
-    val bookList = _bookList
-    val onClick = _onClick
+    private val bookList = _bookList
+    private val onClick = _onClick
 
     // Assigning the book directly to the onClick function instead of the View
     // That leaves less/no work in the callback itself

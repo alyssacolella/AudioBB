@@ -57,9 +57,14 @@ class BookListFragment : Fragment() {
                     putSerializable(BOOK_LIST, bookList)
                 }
             }
+
+        fun bookListUpdated() {
+            //
+        }
     }
 
     interface BookSelectedInterface {
         fun bookSelected()
     }
+
 }
