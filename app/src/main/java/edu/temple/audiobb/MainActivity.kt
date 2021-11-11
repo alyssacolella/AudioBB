@@ -40,7 +40,6 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
 
         val searchActivityIntent = Intent(this, BookSearchActivity::class.java)
 
-
         findViewById<Button>(R.id.mainSearchButton).setOnClickListener{
             searchActivityLauncher.launch(searchActivityIntent)
         }

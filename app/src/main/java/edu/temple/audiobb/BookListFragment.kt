@@ -34,7 +34,6 @@ class BookListFragment : Fragment() {
 
         val bookViewModel = ViewModelProvider(requireActivity()).get(SelectedBookViewModel::class.java)
 
-        // Using those sweet, sweet lambdas - but an onClickListener will do the job too
         val onClick : (Book) -> Unit = {
                 // Update the ViewModel
                 book: Book -> bookViewModel.setSelectedBook(book)
@@ -59,7 +58,13 @@ class BookListFragment : Fragment() {
             }
 
         fun bookListUpdated() {
-            //
+//            adapter.notifyDataSetChanged()
+//            this.adapter.notifyDataSetChanged()
+//            BookListAdapter.notifyDataSetChanged()
+//            RecyclerView.adapter.notifyDataSetChanged()
+//            var adapter: BookListAdapter? = null
+//            var adapter = BookListAdapter(BookList(), {})
+//            adapter!!.notifyDataSetChanged()
         }
     }
 
