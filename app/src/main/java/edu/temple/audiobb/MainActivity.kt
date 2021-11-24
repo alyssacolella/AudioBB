@@ -1,12 +1,21 @@
 package edu.temple.audiobb
 
+import android.content.ComponentName
 import android.content.Intent
+import android.content.ServiceConnection
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.IBinder
+import android.os.Looper
 import android.view.View
+import android.widget.Button
 import android.widget.ImageButton
+import android.widget.SeekBar
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
+import edu.temple.audlibplayer.PlayerService
 
 class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface {
 
@@ -19,6 +28,29 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
             bookListFragment.bookListUpdated()
         }
 
+    }
+
+    var isConnected = false
+    lateinit var controlsBinder: edu.temple.audlibplayer.PlayerService.MediaControlBinder
+
+    lateinit var nowPlayingText: TextView
+    lateinit var playButton: Button
+    lateinit var pauseButton: Button
+    lateinit var stopButton: Button
+    lateinit var seekBar: SeekBar
+
+    val progressHandler = Handler(Looper.getMainLooper())
+
+    val serviceConnection = object: ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            isConnected = true
+            controlsBinder = service as PlayerService.MediaControlBinder
+            controlsBinder.setProgressHandler(progressHandler)
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            isConnected = false
+        }
     }
 
     private val isSingleContainer : Boolean by lazy{
@@ -40,6 +72,27 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        nowPlayingText = findViewById(R.id.nowPlayingText)
+        playButton = findViewById(R.id.playButton)
+        pauseButton = findViewById(R.id.pauseButton)
+        stopButton = findViewById(R.id.stopButton)
+        seekBar = findViewById(R.id.seekBar)
+
+        playButton.setOnClickListener{
+            if(isConnected){
+                //controlsBinder.play()
+                //nowPlayingText.text()
+            }
+        }
+
+        pauseButton.setOnClickListener{
+            controlsBinder.pause()
+        }
+
+        stopButton.setOnClickListener {
+            controlsBinder.stop()
+        }
 
         // Grab test data
         //getBookList()
@@ -80,6 +133,15 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
             searchRequest.launch(Intent(this, SearchActivity::class.java))
         }
 
+        bindService(Intent(this, PlayerService:: class.java)
+            , serviceConnection
+            , BIND_AUTO_CREATE)
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unbindService(serviceConnection)
     }
 
     override fun onBackPressed() {
