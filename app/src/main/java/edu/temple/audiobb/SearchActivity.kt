@@ -27,8 +27,6 @@ class SearchActivity : AppCompatActivity() {
                     finish()
                 }, {})
             )
-
-
         }
     }
 }

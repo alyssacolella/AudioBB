@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
@@ -73,6 +74,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        Log.d("Gets here", "")
         nowPlayingText = findViewById(R.id.nowPlayingText)
         playButton = findViewById(R.id.playButton)
         pauseButton = findViewById(R.id.pauseButton)
@@ -81,8 +83,8 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
 
         playButton.setOnClickListener{
             if(isConnected){
-                //controlsBinder.play()
-                //nowPlayingText.text()
+                controlsBinder.play(selectedBookViewModel.getSelectedBook().value!!.id)
+                nowPlayingText.text = "Now Playing:" + selectedBookViewModel.getSelectedBook().value!!.title
             }
         }
 
@@ -94,8 +96,9 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
             controlsBinder.stop()
         }
 
-        // Grab test data
-        //getBookList()
+        bindService(Intent(this, PlayerService:: class.java)
+            , serviceConnection
+            , BIND_AUTO_CREATE)
 
         // If we're switching from one container to two containers
         // clear BookDetailsFragment from container1
@@ -133,15 +136,6 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
             searchRequest.launch(Intent(this, SearchActivity::class.java))
         }
 
-        bindService(Intent(this, PlayerService:: class.java)
-            , serviceConnection
-            , BIND_AUTO_CREATE)
-
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        unbindService(serviceConnection)
     }
 
     override fun onBackPressed() {
@@ -161,5 +155,12 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
                 .addToBackStack(null)
                 .commit()
         }
+
+        controlsBinder.play(selectedBookViewModel.getSelectedBook().value!!.id)
     }
+
+//    override fun onDestroy() {
+//        super.onDestroy()
+//        unbindService(serviceConnection)
+//    }
 }
