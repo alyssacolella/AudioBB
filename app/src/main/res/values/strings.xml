@@ -1,6 +1,3 @@
 <resources>
     <string name="app_name">AudioBB</string>
-    <string name="dialogCancel">Cancel</string>
-    <string name="dialogSearch">Search</string>
-    <string name="searchDirections">Search Book Title or Author</string>
 </resources>

@@ -8,8 +8,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class BookListAdapter (_bookList: BookList, _onClick: (Book) -> Unit) : RecyclerView.Adapter<BookListAdapter.BookViewHolder>() {
-    private val bookList = _bookList
-    private val onClick = _onClick
+    val bookList = _bookList
+    val onClick = _onClick
 
     // Assigning the book directly to the onClick function instead of the View
     // That leaves less/no work in the callback itself
@@ -34,13 +34,13 @@ class BookListAdapter (_bookList: BookList, _onClick: (Book) -> Unit) : Recycler
 
     // Bind the book to the holder along with the values for the views
     override fun onBindViewHolder(holder: BookViewHolder, position: Int) {
-        holder.titleTextView.text = bookList[position].title
-        holder.authorTextView.text = bookList[position].author
-        holder.book = bookList[position]
+        holder.titleTextView.text = bookList[position]?.title
+        holder.authorTextView.text = bookList[position]?.author
+        holder.book = bookList.get(position)!!
     }
 
     override fun getItemCount(): Int {
-        return bookList.size()
+        return bookList.size()!!
     }
 
 }

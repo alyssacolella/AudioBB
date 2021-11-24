@@ -14,7 +14,7 @@ class BookDetailsFragment : Fragment() {
 
     lateinit var titleTextView: TextView
     lateinit var authorTextView: TextView
-    lateinit var bookImageView: ImageView
+    lateinit var coverImageView: ImageView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -24,7 +24,7 @@ class BookDetailsFragment : Fragment() {
 
         titleTextView = layout.findViewById(R.id.titleTextView)
         authorTextView = layout.findViewById(R.id.authorTextView)
-        bookImageView = layout.findViewById(R.id.bookImageView)
+        coverImageView = layout.findViewById(R.id.bookCoverImageView)
 
         return layout
     }
@@ -40,10 +40,7 @@ class BookDetailsFragment : Fragment() {
         book?.run {
             titleTextView.text = title
             authorTextView.text = author
-            Picasso.get().load(coverURL).into(bookImageView)
+            Picasso.get().load(coverURL).into(coverImageView)
         }
     }
-
-
-
 }
