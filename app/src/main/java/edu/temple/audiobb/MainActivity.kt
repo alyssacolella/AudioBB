@@ -22,17 +22,10 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
 
     private lateinit var bookListFragment : BookListFragment
 
-    private val searchRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        supportFragmentManager.popBackStack()
-        it.data?.run {
-            bookListViewModel.copyBooks(getSerializableExtra(BookList.BOOKLIST_KEY) as BookList)
-            bookListFragment.bookListUpdated()
-        }
-    }
-
     var isConnected = false
     lateinit var controlsBinder: edu.temple.audlibplayer.PlayerService.MediaControlBinder
 
+    //control fragment views
     lateinit var nowPlayingText: TextView
     lateinit var playButton: Button
     lateinit var pauseButton: Button
@@ -41,11 +34,13 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
     lateinit var progressText: TextView
 
     var playFromTime: Int = 0
+    var currentTime: Int = 0
     var endTime: Int = 0
 
 
     val progressHandler = Handler(Looper.getMainLooper()){
-        progressText.text = it.arg2.toString()
+        currentTime = it.arg2
+        progressText.text = currentTime.toString()
         true
     }
 
@@ -58,6 +53,14 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
 
         override fun onServiceDisconnected(name: ComponentName?) {
             isConnected = false
+        }
+    }
+
+    private val searchRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        supportFragmentManager.popBackStack()
+        it.data?.run {
+            bookListViewModel.copyBooks(getSerializableExtra(BookList.BOOKLIST_KEY) as BookList)
+            bookListFragment.bookListUpdated()
         }
     }
 
@@ -83,12 +86,14 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
 
         Log.d("Gets here", "")
 
-        nowPlayingText = findViewById(R.id.nowPlayingText)!!
-        playButton = findViewById(R.id.playButton)!!
-        pauseButton = findViewById(R.id.pauseButton)!!
-        stopButton = findViewById(R.id.stopButton)!!
-        seekBar = findViewById(R.id.seekBar)!!
-        progressText = findViewById(R.id.progressText)!!
+        supportFragmentManager.beginTransaction().add(R.id.controlsContainer, ControlFragment())
+
+        nowPlayingText = findViewById(R.id.nowPlayingText)
+        playButton = findViewById(R.id.playButton)
+        pauseButton = findViewById(R.id.pauseButton)
+        stopButton = findViewById(R.id.stopButton)
+        seekBar = findViewById(R.id.seekBar)
+        progressText = findViewById(R.id.progressText)
 
         playButton.setOnClickListener{
             if(isConnected){
@@ -194,8 +199,8 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         controlsBinder.play(selectedBookViewModel.getSelectedBook().value!!.id)
     }
 
-//    override fun onDestroy() {
-//        super.onDestroy()
-//        unbindService(serviceConnection)
-//    }
+    override fun onDestroy() {
+        super.onDestroy()
+        unbindService(serviceConnection)
+    }
 }

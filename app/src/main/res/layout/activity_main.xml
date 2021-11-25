@@ -33,7 +33,6 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/controlsContainer"
-        android:name="edu.temple.audiobb.ControlFragment"
         android:layout_width="390dp"
         android:layout_height="172dp"
         android:layout_marginStart="4dp"
