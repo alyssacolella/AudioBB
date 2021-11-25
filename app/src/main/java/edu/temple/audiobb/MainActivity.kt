@@ -3,11 +3,8 @@ package edu.temple.audiobb
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
+import android.os.*
 import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import android.os.Handler
-import android.os.IBinder
-import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -15,10 +12,11 @@ import android.widget.ImageButton
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import edu.temple.audlibplayer.PlayerService
 
-class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface {
+class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface, ControlFragment.ControlsClickedInterface {
 
     private lateinit var bookListFragment : BookListFragment
 
@@ -26,21 +24,23 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
     lateinit var controlsBinder: edu.temple.audlibplayer.PlayerService.MediaControlBinder
 
     //control fragment views
-    lateinit var nowPlayingText: TextView
-    lateinit var playButton: Button
-    lateinit var pauseButton: Button
-    lateinit var stopButton: Button
-    lateinit var seekBar: SeekBar
-    lateinit var progressText: TextView
+//    lateinit var nowPlayingText: TextView
 
-    var playFromTime: Int = 0
+//    lateinit var seekBar: SeekBar
+//    lateinit var progressText: TextView
+
+
     var currentTime: Int = 0
-    var endTime: Int = 0
+    var bookDuration: Int = 0
 
 
     val progressHandler = Handler(Looper.getMainLooper()){
-        currentTime = it.arg2
-        progressText.text = currentTime.toString()
+        //currentTime = it.arg1
+        //currentTime = it.arg2
+        currentTime = it.what
+        currentTime = 
+        Log.d("Current time", currentTime.toString())
+        //progressText.text = currentTime.toString()
         true
     }
 
@@ -84,57 +84,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        Log.d("Gets here", "")
-
-        supportFragmentManager.beginTransaction().add(R.id.controlsContainer, ControlFragment())
-
-        nowPlayingText = findViewById(R.id.nowPlayingText)
-        playButton = findViewById(R.id.playButton)
-        pauseButton = findViewById(R.id.pauseButton)
-        stopButton = findViewById(R.id.stopButton)
-        seekBar = findViewById(R.id.seekBar)
-        progressText = findViewById(R.id.progressText)
-
-        playButton.setOnClickListener{
-            if(isConnected){
-
-                //get currently selected book
-                val currentBook = selectedBookViewModel.getSelectedBook().value!!
-
-                //get the full time of the book and set the seek bar max to the end time
-                endTime = currentBook.duration
-                seekBar.max = endTime
-
-                playFromTime = seekBar.progress * endTime
-
-                //jump to correct progress, play selected book
-                controlsBinder.seekTo(playFromTime)
-                controlsBinder.play(currentBook.id)
-
-                //set the now playing text
-                nowPlayingText.text = "Now Playing:" + currentBook.title
-
-                //enable pause button, disable play button
-                pauseButton.isEnabled = true
-                playButton.isEnabled = false
-            }
-        }
-
-        pauseButton.setOnClickListener{
-
-            //call on audlib pause function
-            controlsBinder.pause()
-
-            //set the current
-            playFromTime = seekBar.progress
-            pauseButton.isEnabled = false
-            playButton.isEnabled = true
-        }
-
-        stopButton.setOnClickListener {
-            controlsBinder.stop()
-            playFromTime = 0
-        }
+        supportFragmentManager.beginTransaction().add(R.id.controlsContainer, ControlFragment()).commit()
 
         bindService(Intent(this, PlayerService:: class.java)
             , serviceConnection
@@ -195,12 +145,29 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
                 .addToBackStack(null)
                 .commit()
         }
-
-        controlsBinder.play(book.id)
     }
 
     override fun onDestroy() {
         super.onDestroy()
         unbindService(serviceConnection)
+    }
+
+    override fun playClicked() {
+        val currentBook = selectedBookViewModel.getSelectedBook().value
+        if (currentBook != null) {
+            controlsBinder.play(currentBook.id)
+        }
+    }
+
+    override fun pauseClicked() {
+        controlsBinder.pause()
+    }
+
+    override fun stopClicked() {
+        controlsBinder.stop()
+    }
+
+    override fun seekBarClicked() {
+        TODO("Not yet implemented")
     }
 }
