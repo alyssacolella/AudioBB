@@ -184,7 +184,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         super.onBackPressed()
     }
 
-    override fun bookSelected() {
+    override fun bookSelected(book: Book) {
         // Perform a fragment replacement if we only have a single container
         // when a book is selected
 
@@ -196,7 +196,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
                 .commit()
         }
 
-        controlsBinder.play(selectedBookViewModel.getSelectedBook().value!!.id)
+        controlsBinder.play(book.id)
     }
 
     override fun onDestroy() {
