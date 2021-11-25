@@ -28,7 +28,6 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
             bookListViewModel.copyBooks(getSerializableExtra(BookList.BOOKLIST_KEY) as BookList)
             bookListFragment.bookListUpdated()
         }
-
     }
 
     var isConnected = false
@@ -39,8 +38,16 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
     lateinit var pauseButton: Button
     lateinit var stopButton: Button
     lateinit var seekBar: SeekBar
+    lateinit var progressText: TextView
 
-    val progressHandler = Handler(Looper.getMainLooper())
+    var playFromTime: Int = 0
+    var endTime: Int = 0
+
+
+    val progressHandler = Handler(Looper.getMainLooper()){
+        progressText.text = it.arg2.toString()
+        true
+    }
 
     val serviceConnection = object: ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -81,20 +88,47 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         pauseButton = findViewById(R.id.pauseButton)!!
         stopButton = findViewById(R.id.stopButton)!!
         seekBar = findViewById(R.id.seekBar)!!
+        progressText = findViewById(R.id.progressText)!!
 
         playButton.setOnClickListener{
             if(isConnected){
-                controlsBinder.play(selectedBookViewModel.getSelectedBook().value!!.id)
-                nowPlayingText.text = "Now Playing:" + selectedBookViewModel.getSelectedBook().value!!.title
+
+                //get currently selected book
+                val currentBook = selectedBookViewModel.getSelectedBook().value!!
+
+                //get the full time of the book and set the seek bar max to the end time
+                endTime = currentBook.duration
+                seekBar.max = endTime
+
+                playFromTime = seekBar.progress * endTime
+
+                //jump to correct progress, play selected book
+                controlsBinder.seekTo(playFromTime)
+                controlsBinder.play(currentBook.id)
+
+                //set the now playing text
+                nowPlayingText.text = "Now Playing:" + currentBook.title
+
+                //enable pause button, disable play button
+                pauseButton.isEnabled = true
+                playButton.isEnabled = false
             }
         }
 
         pauseButton.setOnClickListener{
+
+            //call on audlib pause function
             controlsBinder.pause()
+
+            //set the current
+            playFromTime = seekBar.progress
+            pauseButton.isEnabled = false
+            playButton.isEnabled = true
         }
 
         stopButton.setOnClickListener {
             controlsBinder.stop()
+            playFromTime = 0
         }
 
         bindService(Intent(this, PlayerService:: class.java)
