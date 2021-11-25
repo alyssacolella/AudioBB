@@ -75,11 +75,12 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         setContentView(R.layout.activity_main)
 
         Log.d("Gets here", "")
-        nowPlayingText = findViewById(R.id.nowPlayingText)
-        playButton = findViewById(R.id.playButton)
-        pauseButton = findViewById(R.id.pauseButton)
-        stopButton = findViewById(R.id.stopButton)
-        seekBar = findViewById(R.id.seekBar)
+
+        nowPlayingText = findViewById(R.id.nowPlayingText)!!
+        playButton = findViewById(R.id.playButton)!!
+        pauseButton = findViewById(R.id.pauseButton)!!
+        stopButton = findViewById(R.id.stopButton)!!
+        seekBar = findViewById(R.id.seekBar)!!
 
         playButton.setOnClickListener{
             if(isConnected){
