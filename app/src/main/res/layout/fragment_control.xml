@@ -17,7 +17,7 @@
         android:clickable="true"
         app:layout_constraintBottom_toTopOf="@+id/nowPlayingText"
         app:layout_constraintEnd_toStartOf="@+id/progressText"
-        app:layout_constraintHorizontal_bias="0.685"
+        app:layout_constraintHorizontal_bias="0.888"
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="SpeakableTextPresentCheck" />
 
@@ -94,7 +94,7 @@
         android:layout_width="82dp"
         android:layout_height="40dp"
         android:layout_marginEnd="28dp"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="12dp"
         app:layout_constraintBottom_toTopOf="@+id/nowPlayingText"
         app:layout_constraintEnd_toEndOf="parent" />
 

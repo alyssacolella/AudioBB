@@ -23,13 +23,16 @@ class ControlFragment : Fragment() {
     lateinit var stopButton: Button
     lateinit var seekBar: SeekBar
     lateinit var progressText: TextView
+    var progressTime: Int = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         // Inflate the layout for this fragment
         val layout =  inflater.inflate(R.layout.fragment_control, container, false)
+
         nowPlayingText = layout.findViewById(R.id.nowPlayingText)
         playButton = layout.findViewById(R.id.playButton)
         pauseButton = layout.findViewById(R.id.pauseButton)
@@ -44,40 +47,69 @@ class ControlFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val bookViewModel = ViewModelProvider(requireActivity()).get(SelectedBookViewModel::class.java)
-
+        val selectedBookViewModel = ViewModelProvider(requireActivity()).get(SelectedBookViewModel::class.java)
 
         playButton.setOnClickListener {
-            playButton.isEnabled = false
-            pauseButton.isEnabled = true
 
-//            val currentBook = bookViewModel.getSelectedBook().value
-//            Log.d("Current book in control fragment play", currentBook.toString())
+            val currentBook = selectedBookViewModel.getSelectedBook().value
 
-            (activity as ControlsClickedInterface).playClicked()
-
-
+            if (currentBook != null) {
+                nowPlayingText.text = "Now Playing: " + currentBook.title
+                Log.d("Playing", currentBook.toString())
+                Log.d("Duration", currentBook.duration.toString())
+            }
+            (activity as ControlsClickedInterface).playClicked(progressTime)
         }
+
         pauseButton.setOnClickListener {
-            playButton.isEnabled = true
-            pauseButton.isEnabled = false
+
+            val currentBook = selectedBookViewModel.getSelectedBook().value
+
+            if (currentBook != null) {
+                progressTime = ((seekBar.progress) / 100) * currentBook.duration
+            }
 
             (activity as ControlsClickedInterface).pauseClicked()
         }
+
         stopButton.setOnClickListener { (activity as ControlsClickedInterface).stopClicked() }
 
-//        seekBar.setOnSeekBarChangeListener(seekBar.progress){
-//            (activity as ControlsClickedInterface).seekBarClicked()
-//        }
+        seekBar.setOnSeekBarChangeListener(object :
+            SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seek: SeekBar,
+                                           progress: Int, fromUser: Boolean) {
+
+                val currentBook = selectedBookViewModel.getSelectedBook().value
+
+                if (currentBook != null) {
+                    progressText.text = (seekBar.progress * currentBook.duration / 100).toString()
+                }
+            }
+
+            override fun onStartTrackingTouch(p0: SeekBar?) {
+
+            }
+
+            override fun onStopTrackingTouch(p0: SeekBar?) {
+
+                val currentBook = selectedBookViewModel.getSelectedBook().value
+
+                if(currentBook != null){
+                    progressText.text = (seekBar.progress * currentBook.duration / 100).toString()
+                    progressTime = (seekBar.progress * currentBook.duration / 100)
+                    (activity as ControlsClickedInterface).playClicked(progressTime)
+                }
+
+            }
+        })
 
     }
 
     interface ControlsClickedInterface {
         //fun playClicked(book: Book)
-        fun playClicked()
+        fun playClicked(progressTime: Int)
         fun pauseClicked()
         fun stopClicked()
         fun seekBarClicked()
-
     }
 }

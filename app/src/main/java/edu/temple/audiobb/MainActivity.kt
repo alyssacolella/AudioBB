@@ -35,11 +35,8 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
 
 
     val progressHandler = Handler(Looper.getMainLooper()){
-        //currentTime = it.arg1
         //currentTime = it.arg2
         currentTime = it.what
-        currentTime = 
-        Log.d("Current time", currentTime.toString())
         //progressText.text = currentTime.toString()
         true
     }
@@ -152,9 +149,10 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         unbindService(serviceConnection)
     }
 
-    override fun playClicked() {
+    override fun playClicked(progressTime: Int) {
         val currentBook = selectedBookViewModel.getSelectedBook().value
         if (currentBook != null) {
+            controlsBinder.seekTo(progressTime)
             controlsBinder.play(currentBook.id)
         }
     }
