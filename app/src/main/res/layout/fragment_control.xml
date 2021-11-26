@@ -9,15 +9,15 @@
 
     <SeekBar
         android:id="@+id/seekBar"
-        android:layout_width="239dp"
-        android:layout_height="49dp"
-        android:layout_marginStart="20dp"
+        android:layout_width="298dp"
+        android:layout_height="39dp"
+        android:layout_marginStart="10dp"
         android:layout_marginEnd="15dp"
-        android:layout_marginBottom="15dp"
+        android:layout_marginBottom="4dp"
         android:clickable="true"
         app:layout_constraintBottom_toTopOf="@+id/nowPlayingText"
         app:layout_constraintEnd_toStartOf="@+id/progressText"
-        app:layout_constraintHorizontal_bias="0.888"
+        app:layout_constraintHorizontal_bias="0.378"
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="SpeakableTextPresentCheck" />
 
@@ -63,7 +63,7 @@
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:layout_marginTop="20dp"
-        android:layout_marginEnd="32dp"
+        android:layout_marginEnd="20dp"
         android:layout_marginBottom="15dp"
         android:textAlignment="center"
         app:icon="@android:drawable/ic_media_play"
@@ -72,7 +72,7 @@
         app:layout_constraintBottom_toTopOf="@+id/seekBar"
         app:layout_constraintEnd_toStartOf="@+id/stopButton"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.001"
+        app:layout_constraintVertical_bias="0.0"
         tools:ignore="SpeakableTextPresentCheck" />
 
     <TextView
@@ -81,20 +81,20 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="16dp"
         android:text="now playing:"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.068"
+        app:layout_constraintHorizontal_bias="0.077"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/progressText"
         android:layout_width="82dp"
         android:layout_height="40dp"
-        android:layout_marginEnd="28dp"
-        android:layout_marginBottom="12dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toTopOf="@+id/nowPlayingText"
         app:layout_constraintEnd_toEndOf="parent" />
 

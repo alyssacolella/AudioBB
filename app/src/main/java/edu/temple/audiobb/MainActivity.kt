@@ -12,6 +12,7 @@ import android.widget.ImageButton
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.setPadding
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import edu.temple.audlibplayer.PlayerService
@@ -23,21 +24,22 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
     var isConnected = false
     lateinit var controlsBinder: edu.temple.audlibplayer.PlayerService.MediaControlBinder
 
-    //control fragment views
-//    lateinit var nowPlayingText: TextView
-
-//    lateinit var seekBar: SeekBar
-//    lateinit var progressText: TextView
-
-
     var currentTime: Int = 0
-    var bookDuration: Int = 0
-
 
     val progressHandler = Handler(Looper.getMainLooper()){
-        //currentTime = it.arg2
-        currentTime = it.what
-        //progressText.text = currentTime.toString()
+
+        if(it.obj != null) {
+            val bookProgressObject = it.obj as PlayerService.BookProgress
+
+            val progressTime = bookProgressObject.progress
+
+            var progressTextView = findViewById<TextView>(R.id.progressText)
+            progressTextView.text = progressTime.toString()
+
+            var seekBar = findViewById<SeekBar>(R.id.seekBar)
+            seekBar.progress = progressTime
+
+        }
         true
     }
 
@@ -152,8 +154,15 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
     override fun playClicked(progressTime: Int) {
         val currentBook = selectedBookViewModel.getSelectedBook().value
         if (currentBook != null) {
-            controlsBinder.seekTo(progressTime)
-            controlsBinder.play(currentBook.id)
+            Log.d("Progress time before seek to", progressTime.toString())
+            if(progressTime > 0){
+                controlsBinder.seekTo(progressTime)
+            }
+            else{
+                controlsBinder.play(currentBook.id)
+            }
+            Log.d("Current book before play", currentBook.toString())
+            
         }
     }
 

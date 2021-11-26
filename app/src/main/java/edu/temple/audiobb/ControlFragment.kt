@@ -41,7 +41,6 @@ class ControlFragment : Fragment() {
         progressText = layout.findViewById(R.id.progressText)
 
         return layout
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -66,7 +65,7 @@ class ControlFragment : Fragment() {
             val currentBook = selectedBookViewModel.getSelectedBook().value
 
             if (currentBook != null) {
-                progressTime = ((seekBar.progress) / 100) * currentBook.duration
+                progressTime = (seekBar.progress * currentBook.duration / 100)
             }
 
             (activity as ControlsClickedInterface).pauseClicked()
@@ -95,8 +94,9 @@ class ControlFragment : Fragment() {
                 val currentBook = selectedBookViewModel.getSelectedBook().value
 
                 if(currentBook != null){
-                    progressText.text = (seekBar.progress * currentBook.duration / 100).toString()
                     progressTime = (seekBar.progress * currentBook.duration / 100)
+                    progressText.text = progressTime.toString()
+
                     (activity as ControlsClickedInterface).playClicked(progressTime)
                 }
 
@@ -106,7 +106,6 @@ class ControlFragment : Fragment() {
     }
 
     interface ControlsClickedInterface {
-        //fun playClicked(book: Book)
         fun playClicked(progressTime: Int)
         fun pauseClicked()
         fun stopClicked()
