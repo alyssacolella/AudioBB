@@ -31,11 +31,13 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
             val bookProgressObject = it.obj as PlayerService.BookProgress
 
             val progressTime = bookProgressObject.progress
+            val duration = selectedBookViewModel.getSelectedBook().value?.duration
 
             var progressTextView = findViewById<TextView>(R.id.progressText)
             progressTextView.text = progressTime.toString()
 
             var seekBar = findViewById<SeekBar>(R.id.seekBar)
+            //Log.d("seek bar progress in handler", progressTime.toString())
             seekBar.progress = progressTime
 
         }
@@ -160,8 +162,11 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
 
             if(time > 0){
                 controlsBinder.seekTo(time)
+                controlsBinder.pause()
             }
-            controlsBinder.play(currentBook.id)
+            else{
+                controlsBinder.play(currentBook.id)
+            }
         }
     }
 

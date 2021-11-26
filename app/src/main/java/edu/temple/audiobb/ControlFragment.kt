@@ -54,6 +54,8 @@ class ControlFragment : Fragment() {
 
             if (currentBook != null) {
                 nowPlayingText.text = "Now Playing: " + currentBook.title
+                Log.d("duration when playing", currentBook.duration.toString())
+                seekBar.max = currentBook.duration
 
             }
             (activity as ControlsClickedInterface).playClicked(progressTime)
@@ -80,7 +82,8 @@ class ControlFragment : Fragment() {
                 val currentBook = selectedBookViewModel.getSelectedBook().value
 
                 if (currentBook != null) {
-                    progressText.text = (seekBar.progress * currentBook.duration / 100).toString()
+                    //progressText.text = (seekBar.progress * currentBook.duration / 100).toString()
+                    progressText.text = progress.toString()
                 }
             }
 
@@ -93,7 +96,8 @@ class ControlFragment : Fragment() {
                 val currentBook = selectedBookViewModel.getSelectedBook().value
 
                 if(currentBook != null){
-                    progressTime = (seekBar.progress * currentBook.duration / 100)
+
+                    progressTime = seekBar.progress
                     progressText.text = progressTime.toString()
 
                     Log.d("Progress Time", progressTime.toString())
