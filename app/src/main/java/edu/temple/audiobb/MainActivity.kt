@@ -24,7 +24,6 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
     var isConnected = false
     lateinit var controlsBinder: edu.temple.audlibplayer.PlayerService.MediaControlBinder
 
-    var currentTime: Int = 0
 
     val progressHandler = Handler(Looper.getMainLooper()){
 
@@ -128,7 +127,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
     }
 
     override fun onBackPressed() {
-        // Backpress clears the selected book
+        // Back press clears the selected book
         selectedBookViewModel.setSelectedBook(null)
         super.onBackPressed()
     }
@@ -151,18 +150,18 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         unbindService(serviceConnection)
     }
 
-    override fun playClicked(progressTime: Int) {
+    override fun playClicked(time: Int) {
         val currentBook = selectedBookViewModel.getSelectedBook().value
+
+        //var time = (progressHandler.obtainMessage().obj as PlayerService.BookProgress).progress
         if (currentBook != null) {
-            Log.d("Progress time before seek to", progressTime.toString())
-            if(progressTime > 0){
-                controlsBinder.seekTo(progressTime)
+
+            Log.d("Time in playClicked", time.toString())
+
+            if(time > 0){
+                controlsBinder.seekTo(time)
             }
-            else{
-                controlsBinder.play(currentBook.id)
-            }
-            Log.d("Current book before play", currentBook.toString())
-            
+            controlsBinder.play(currentBook.id)
         }
     }
 

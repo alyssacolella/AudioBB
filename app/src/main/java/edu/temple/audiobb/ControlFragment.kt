@@ -54,19 +54,18 @@ class ControlFragment : Fragment() {
 
             if (currentBook != null) {
                 nowPlayingText.text = "Now Playing: " + currentBook.title
-                Log.d("Playing", currentBook.toString())
-                Log.d("Duration", currentBook.duration.toString())
+
             }
             (activity as ControlsClickedInterface).playClicked(progressTime)
         }
 
         pauseButton.setOnClickListener {
 
-            val currentBook = selectedBookViewModel.getSelectedBook().value
+            //val currentBook = selectedBookViewModel.getSelectedBook().value
 
-            if (currentBook != null) {
-                progressTime = (seekBar.progress * currentBook.duration / 100)
-            }
+//            if (currentBook != null) {
+//                progressTime = (seekBar.progress * currentBook.duration / 100)
+//            }
 
             (activity as ControlsClickedInterface).pauseClicked()
         }
@@ -86,7 +85,7 @@ class ControlFragment : Fragment() {
             }
 
             override fun onStartTrackingTouch(p0: SeekBar?) {
-
+                (activity as ControlsClickedInterface).pauseClicked()
             }
 
             override fun onStopTrackingTouch(p0: SeekBar?) {
@@ -96,6 +95,9 @@ class ControlFragment : Fragment() {
                 if(currentBook != null){
                     progressTime = (seekBar.progress * currentBook.duration / 100)
                     progressText.text = progressTime.toString()
+
+                    Log.d("Progress Time", progressTime.toString())
+                    Log.d("Progress", seekBar.progress.toString())
 
                     (activity as ControlsClickedInterface).playClicked(progressTime)
                 }
