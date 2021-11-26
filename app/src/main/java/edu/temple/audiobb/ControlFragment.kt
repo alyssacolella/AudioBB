@@ -63,16 +63,20 @@ class ControlFragment : Fragment() {
 
         pauseButton.setOnClickListener {
 
-            //val currentBook = selectedBookViewModel.getSelectedBook().value
+            val currentBook = selectedBookViewModel.getSelectedBook().value
 
-//            if (currentBook != null) {
-//                progressTime = (seekBar.progress * currentBook.duration / 100)
-//            }
+            if (currentBook != null) {
+                progressTime = seekBar.progress
+            }
 
             (activity as ControlsClickedInterface).pauseClicked()
         }
 
-        stopButton.setOnClickListener { (activity as ControlsClickedInterface).stopClicked() }
+        stopButton.setOnClickListener {
+            progressTime = 0
+            seekBar.progress = 0
+            (activity as ControlsClickedInterface).stopClicked()
+        }
 
         seekBar.setOnSeekBarChangeListener(object :
             SeekBar.OnSeekBarChangeListener {

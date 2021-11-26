@@ -11,7 +11,7 @@
         android:layout_height="484dp"
         android:layout_marginStart="12dp"
         android:layout_marginTop="4dp"
-        app:layout_constraintBottom_toTopOf="@+id/fragmentContainerView"
+        app:layout_constraintBottom_toTopOf="@+id/controlsContainer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchButton"
         app:layout_constraintVertical_bias="0.02"
@@ -44,7 +44,7 @@
         tools:ignore="SpeakableTextPresentCheck" />
 
     <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragmentContainerView"
+        android:id="@+id/controlsContainer"
         android:layout_width="381dp"
         android:layout_height="164dp"
         android:layout_marginStart="4dp"
