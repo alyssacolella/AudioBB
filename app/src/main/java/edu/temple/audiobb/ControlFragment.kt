@@ -1,124 +1,79 @@
 package edu.temple.audiobb
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.ImageButton
 import android.widget.SeekBar
 import android.widget.TextView
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModelProvider
-
-private const val ARG_PARAM1 = "param1"
 
 
 class ControlFragment : Fragment() {
 
-    lateinit var nowPlayingText: TextView
-    lateinit var playButton: Button
-    lateinit var pauseButton: Button
-    lateinit var stopButton: Button
-    lateinit var seekBar: SeekBar
-    lateinit var progressText: TextView
-    var progressTime: Int = 0
+    lateinit var playButton : ImageButton
+    lateinit var pauseButton : ImageButton
+    lateinit var stopButton : ImageButton
+    var seekBar : SeekBar? = null
+    var nowPlayingTextView : TextView? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         // Inflate the layout for this fragment
-        val layout =  inflater.inflate(R.layout.fragment_control, container, false)
+        val layout = inflater.inflate(R.layout.fragment_control, container, false)
 
-        nowPlayingText = layout.findViewById(R.id.nowPlayingText)
         playButton = layout.findViewById(R.id.playButton)
         pauseButton = layout.findViewById(R.id.pauseButton)
         stopButton = layout.findViewById(R.id.stopButton)
         seekBar = layout.findViewById(R.id.seekBar)
-        progressText = layout.findViewById(R.id.progressText)
+        nowPlayingTextView = layout.findViewById(R.id.nowPlayingTextView)
 
-        return layout
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        val selectedBookViewModel = ViewModelProvider(requireActivity()).get(SelectedBookViewModel::class.java)
-
-        playButton.setOnClickListener {
-
-            val currentBook = selectedBookViewModel.getSelectedBook().value
-
-            if (currentBook != null) {
-                nowPlayingText.text = "Now Playing: " + currentBook.title
-                Log.d("duration when playing", currentBook.duration.toString())
-                seekBar.max = currentBook.duration
-
-            }
-            (activity as ControlsClickedInterface).playClicked(progressTime)
-        }
-
-        pauseButton.setOnClickListener {
-
-            val currentBook = selectedBookViewModel.getSelectedBook().value
-
-            if (currentBook != null) {
-                progressTime = seekBar.progress
-            }
-
-            (activity as ControlsClickedInterface).pauseClicked()
-        }
-
-        stopButton.setOnClickListener {
-            progressTime = 0
-            seekBar.progress = 0
-            (activity as ControlsClickedInterface).stopClicked()
-        }
-
-        seekBar.setOnSeekBarChangeListener(object :
-            SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seek: SeekBar,
-                                           progress: Int, fromUser: Boolean) {
-
-                val currentBook = selectedBookViewModel.getSelectedBook().value
-
-                if (currentBook != null) {
-                    //progressText.text = (seekBar.progress * currentBook.duration / 100).toString()
-                    progressText.text = progress.toString()
+        seekBar?.setOnSeekBarChangeListener( object: SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser) {
+                    (activity as MediaControlInterface).seek(progress)
                 }
             }
 
-            override fun onStartTrackingTouch(p0: SeekBar?) {
-                (activity as ControlsClickedInterface).pauseClicked()
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
             }
 
-            override fun onStopTrackingTouch(p0: SeekBar?) {
-
-                val currentBook = selectedBookViewModel.getSelectedBook().value
-
-                if(currentBook != null){
-
-                    progressTime = seekBar.progress
-                    progressText.text = progressTime.toString()
-
-                    Log.d("Progress Time", progressTime.toString())
-                    Log.d("Progress", seekBar.progress.toString())
-
-                    (activity as ControlsClickedInterface).playClicked(progressTime)
-                }
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
 
             }
         })
 
+        val onClickListener = View.OnClickListener {
+            var parent = activity as MediaControlInterface
+            when (it.id) {
+                R.id.playButton -> parent.play()
+                R.id.pauseButton -> parent.pause()
+                R.id.stopButton -> parent.stop()
+            }
+        }
+
+        playButton.setOnClickListener(onClickListener)
+        pauseButton.setOnClickListener(onClickListener)
+        stopButton.setOnClickListener(onClickListener)
+
+        return layout
     }
 
-    interface ControlsClickedInterface {
-        fun playClicked(progressTime: Int)
-        fun pauseClicked()
-        fun stopClicked()
-        fun seekBarClicked()
+    fun setNowPlaying(title: String) {
+        nowPlayingTextView?.text = title
+    }
+
+    fun setPlayProgress(progress: Int) {
+        seekBar?.setProgress(progress, true)
+    }
+
+    interface MediaControlInterface {
+        fun play()
+        fun pause()
+        fun stop()
+        fun seek(position: Int)
     }
 }
