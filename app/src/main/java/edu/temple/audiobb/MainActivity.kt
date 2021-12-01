@@ -1,8 +1,6 @@
 package edu.temple.audiobb
 
-import android.content.ComponentName
-import android.content.Intent
-import android.content.ServiceConnection
+import android.content.*
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -17,6 +15,8 @@ import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import edu.temple.audlibplayer.PlayerService
+import java.io.*
+import java.net.URL
 
 class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface , ControlFragment.MediaControlInterface{
 
@@ -24,6 +24,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
     private lateinit var serviceIntent : Intent
     private lateinit var mediaControlBinder : PlayerService.MediaControlBinder
     private var connected = false
+    private lateinit var preferences: SharedPreferences
 
     val audiobookHandler = Handler(Looper.getMainLooper()) { msg ->
 
@@ -112,6 +113,9 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Get preferences for this component
+        preferences = getPreferences(MODE_PRIVATE)
+
         playingBookViewModel.getPlayingBook().observe(this, {
             (supportFragmentManager.findFragmentById(R.id.controlFragmentContainerView) as ControlFragment).setNowPlaying(it.title)
         })
@@ -184,11 +188,50 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
 
     override fun play() {
         if (connected && selectedBookViewModel.getSelectedBook().value != null) {
+
+            val selected = selectedBookViewModel.getSelectedBook().value
+
             Log.d("Button pressed", "Play button")
-            mediaControlBinder.play(selectedBookViewModel.getSelectedBook().value!!.id)
-            playingBookViewModel.setPlayingBook(selectedBookViewModel.getSelectedBook().value)
+
+            var selectedUrl = "https://kamorris.com/lab/audlib/download.php?id=" + selected!!.id
+
+            if(fileExists("${selected.id}.mp3")){
+                Log.d("Playing", "downloaded file")
+                mediaControlBinder.play(File(filesDir, "${selected.id}.mp3"), 0)
+            }
+            else{
+                downloadAudio(selectedUrl, selected!!.id.toString())
+                mediaControlBinder.play(selected!!.id)
+            }
+
+            playingBookViewModel.setPlayingBook(selected)
             startService(serviceIntent)
         }
+    }
+
+    fun downloadAudio(urlInput: String, id: String){
+
+        val url = URL(urlInput)
+        val connection = url.openConnection()
+        connection.connect()
+        val inputStream = BufferedInputStream(url.openStream())
+        val outputStream = this.openFileOutput("$id.mp3", Context.MODE_PRIVATE)
+        val data = ByteArray(1024)
+        var count = inputStream.read(data)
+        var total: Long = 0
+        while (inputStream.read(data).also { count = it } != -1) {
+            total += count.toLong()
+            outputStream.write(data, 0, count)
+        }
+        outputStream.flush()
+        outputStream.close()
+        inputStream.close()
+    }
+
+    fun fileExists(fileName: String): Boolean {
+        val path: String = this.filesDir.absolutePath.toString() + "/" + fileName
+        val file = File(path)
+        return file.exists()
     }
 
     override fun pause() {
