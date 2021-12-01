@@ -1,6 +1,8 @@
 package edu.temple.audiobb
 
 import android.os.Bundle
+import android.os.ResultReceiver
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -34,7 +36,7 @@ class BookListFragment : Fragment() {
                 book: Book -> bookViewModel.setSelectedBook(book)
                 // Inform the activity of the selection so as to not have the event replayed
                 // when the activity is restarted
-                (activity as BookSelectedInterface).bookSelected(book)
+                (activity as BookSelectedInterface).bookSelected()
         }
         with (view as RecyclerView) {
             layoutManager = LinearLayoutManager(requireActivity())
@@ -60,6 +62,6 @@ class BookListFragment : Fragment() {
     }
 
     interface BookSelectedInterface {
-        fun bookSelected(book: Book)
+        fun bookSelected()
     }
 }

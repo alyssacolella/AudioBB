@@ -2,101 +2,60 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     tools:context=".ControlFragment">
+
+    <ImageButton
+        android:id="@+id/playButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:src="@android:drawable/ic_media_play"
+        app:layout_constraintEnd_toStartOf="@+id/pauseButton"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/stopButton"
+        app:layout_constraintTop_toBottomOf="@+id/nowPlayingTextView" />
 
     <SeekBar
         android:id="@+id/seekBar"
-        android:layout_width="298dp"
-        android:layout_height="39dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="4dp"
-        android:clickable="true"
-        app:layout_constraintBottom_toTopOf="@+id/nowPlayingText"
-        app:layout_constraintEnd_toStartOf="@+id/progressText"
-        app:layout_constraintHorizontal_bias="0.378"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        tools:ignore="SpeakableTextPresentCheck" />
+        app:layout_constraintTop_toBottomOf="@+id/playButton" />
 
-    <Button
-        android:id="@+id/pauseButton"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="15dp"
-        android:layout_marginBottom="15dp"
-        android:textAlignment="center"
-        app:icon="@android:drawable/ic_media_pause"
-        app:iconGravity="textEnd"
-        app:iconSize="20dp"
-        app:layout_constraintBottom_toTopOf="@+id/seekBar"
-        app:layout_constraintEnd_toStartOf="@+id/playButton"
-        app:layout_constraintHorizontal_bias="0.638"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        tools:ignore="SpeakableTextPresentCheck" />
-
-    <Button
+    <ImageButton
         android:id="@+id/stopButton"
         android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="40dp"
-        android:layout_marginBottom="15dp"
-        android:textAlignment="center"
-        app:icon="@android:drawable/checkbox_off_background"
-        app:iconGravity="textEnd"
-        app:iconSize="15dp"
-        app:layout_constraintBottom_toTopOf="@+id/progressText"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.001"
-        tools:ignore="SpeakableTextPresentCheck" />
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/playButton" />
 
-    <Button
-        android:id="@+id/playButton"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="15dp"
-        android:textAlignment="center"
-        app:icon="@android:drawable/ic_media_play"
-        app:iconGravity="textEnd"
-        app:iconSize="20dp"
-        app:layout_constraintBottom_toTopOf="@+id/seekBar"
-        app:layout_constraintEnd_toStartOf="@+id/stopButton"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        tools:ignore="SpeakableTextPresentCheck" />
-
-    <TextView
-        android:id="@+id/nowPlayingText"
+    <ImageButton
+        android:id="@+id/pauseButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="16dp"
-        android:text="now playing:"
-        android:textSize="15sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginEnd="4dp"
+        android:src="@android:drawable/ic_media_pause"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.077"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/playButton" />
 
     <TextView
-        android:id="@+id/progressText"
+        android:id="@+id/nowPlayingTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="4dp"
-        android:padding="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/nowPlayingText"
-        app:layout_constraintEnd_toEndOf="parent" />
-
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="16dp"
+        tools:text="Now Playing" />
 </androidx.constraintlayout.widget.ConstraintLayout>
