@@ -7,6 +7,7 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
+import android.util.SparseArray
 import android.view.View
 import android.widget.ImageButton
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,6 +19,8 @@ import edu.temple.audlibplayer.PlayerService
 import java.io.*
 import java.net.URL
 
+private const val SAVED_PROGRESS_KEY = "saved_progress"
+
 class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface , ControlFragment.MediaControlInterface{
 
     private lateinit var bookListFragment : BookListFragment
@@ -25,6 +28,9 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
     private lateinit var mediaControlBinder : PlayerService.MediaControlBinder
     private var connected = false
     private lateinit var preferences: SharedPreferences
+    //val preferences: SharedPreferences = getSharedPreferences(SAVED_PROGRESS_KEY, Context.MODE_PRIVATE)
+    var progressArray: SparseArray<Int> = SparseArray()
+    var savedProgressFile: File = File(filesDir, "SavedProgress.txt")
 
     val audiobookHandler = Handler(Looper.getMainLooper()) { msg ->
 
@@ -58,7 +64,11 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
             supportFragmentManager.findFragmentById(R.id.controlFragmentContainerView)?.run{
                 with (this as ControlFragment) {
                     playingBookViewModel.getPlayingBook().value?.also {
-                        setPlayProgress(((bookProgress.progress / it.duration.toFloat()) * 100).toInt())
+
+                        var progress = ((bookProgress.progress / it.duration.toFloat()) * 100).toInt()
+                        setPlayProgress(progress)
+
+                        progressArray.put(playingBookViewModel.getPlayingBook().value!!.id, bookProgress.progress)
                     }
                 }
             }
@@ -113,8 +123,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Get preferences for this component
-        preferences = getPreferences(MODE_PRIVATE)
+        preferences = getSharedPreferences(SAVED_PROGRESS_KEY, Context.MODE_PRIVATE)
 
         playingBookViewModel.getPlayingBook().observe(this, {
             (supportFragmentManager.findFragmentById(R.id.controlFragmentContainerView) as ControlFragment).setNowPlaying(it.title)
@@ -125,9 +134,6 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
 
         // bind to service
         bindService(serviceIntent, serviceConnection, BIND_AUTO_CREATE)
-
-        // Grab test data
-        // getBookList()
 
         // If we're switching from one container to two containers
         // clear BookDetailsFragment from container1
@@ -169,6 +175,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
 
     override fun onBackPressed() {
         // Backpress clears the selected book
+
         selectedBookViewModel.setSelectedBook(null)
         super.onBackPressed()
     }
@@ -189,57 +196,45 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
     override fun play() {
         if (connected && selectedBookViewModel.getSelectedBook().value != null) {
 
-            val selected = selectedBookViewModel.getSelectedBook().value
-
             Log.d("Button pressed", "Play button")
 
-            var selectedUrl = "https://kamorris.com/lab/audlib/download.php?id=" + selected!!.id
+            val selectedBook = selectedBookViewModel.getSelectedBook().value
+            var selectedUrl = "https://kamorris.com/lab/audlib/download.php?id=" + selectedBook!!.id
 
-            if(fileExists("${selected.id}.mp3")){
+            if(progressArray.get(selectedBook.id) == null){
+                progressArray.put(selectedBook.id, 0)
+            }
+
+            //play from file if it exists in internal storage
+            if(fileExists("${selectedBook!!.id}.mp3")){
                 Log.d("Playing", "downloaded file")
-                mediaControlBinder.play(File(filesDir, "${selected.id}.mp3"), 0)
+                //var time = preferences.getInt("${selectedBook!!.id}_key", 0)
+                Log.d("Time in array", progressArray.get(selectedBook.id).toString())
+                mediaControlBinder.play(File(filesDir, "${selectedBook!!.id}.mp3"), progressArray.get(selectedBook.id))
             }
-            else{
-                downloadAudio(selectedUrl, selected!!.id.toString())
-                mediaControlBinder.play(selected!!.id)
+            else{ //if file doesn't exist, stream it for now and download the mp3 file
+                Log.d("Book", "not downloaded yet")
+                mediaControlBinder.seekTo(progressArray.get(selectedBook.id))
+                mediaControlBinder.play(selectedBook!!.id)
+                DownloadAudio(this, selectedBook!!.id.toString()).execute(selectedUrl)
             }
 
-            playingBookViewModel.setPlayingBook(selected)
+            playingBookViewModel.setPlayingBook(selectedBook)
             startService(serviceIntent)
         }
     }
 
-    fun downloadAudio(urlInput: String, id: String){
-
-        val url = URL(urlInput)
-        val connection = url.openConnection()
-        connection.connect()
-        val inputStream = BufferedInputStream(url.openStream())
-        val outputStream = this.openFileOutput("$id.mp3", Context.MODE_PRIVATE)
-        val data = ByteArray(1024)
-        var count = inputStream.read(data)
-        var total: Long = 0
-        while (inputStream.read(data).also { count = it } != -1) {
-            total += count.toLong()
-            outputStream.write(data, 0, count)
-        }
-        outputStream.flush()
-        outputStream.close()
-        inputStream.close()
-    }
-
-    fun fileExists(fileName: String): Boolean {
-        val path: String = this.filesDir.absolutePath.toString() + "/" + fileName
-        val file = File(path)
-        return file.exists()
-    }
-
     override fun pause() {
-        if (connected) mediaControlBinder.pause()
+        if (connected) {
+            mediaControlBinder.pause()
+        }
     }
 
     override fun stop() {
         if (connected) {
+            //set progress back to zero
+            progressArray.put(selectedBookViewModel.getSelectedBook().value!!.id, 0)
+
             mediaControlBinder.stop()
             stopService(serviceIntent)
         }
@@ -248,6 +243,14 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
     override fun seek(position: Int) {
         // Converting percentage to proper book progress
         if (connected) mediaControlBinder.seekTo((playingBookViewModel.getPlayingBook().value!!.duration * (position.toFloat() / 100)).toInt())
+    }
+
+    fun fileExists(fileName: String): Boolean {
+        val path: String = this.filesDir.absolutePath.toString() + "/" + fileName
+        Log.d("File path", path)
+
+        val file = File(path)
+        return file.exists()
     }
 
     override fun onDestroy() {
