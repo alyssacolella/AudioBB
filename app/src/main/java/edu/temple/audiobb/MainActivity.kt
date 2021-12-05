@@ -129,9 +129,8 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
             savedProgressFile.createNewFile()
         }
 
-        var fis = this.openFileInput(savedProgressFile.name)
-        //var fis = FileInputStream(savedProgressFile)
 
+        var fis = FileInputStream(savedProgressFile)
         var ois = ObjectInputStream(fis)
         if(ois.readObject() as ProgressArray != null){
             recordedTimes = ois.readObject() as ProgressArray
@@ -193,7 +192,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
     }
 
     override fun onBackPressed() {
-        // Backpress clears the selected book
+        // Back press clears the selected book
         saveTimesToFile()
         selectedBookViewModel.setSelectedBook(null)
         super.onBackPressed()
@@ -275,6 +274,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
     fun saveTimesToFile(){
         var fos = openFileOutput(savedProgressFile.name, Context.MODE_PRIVATE)
         var oos = ObjectOutputStream(fos)
+
         oos.writeObject(recordedTimes)
         oos.close()
         fos.close()
