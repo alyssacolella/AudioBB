@@ -28,8 +28,9 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
     private var connected = false
     private lateinit var preferences: SharedPreferences
     //val preferences: SharedPreferences = getSharedPreferences(SAVED_PROGRESS_KEY, Context.MODE_PRIVATE)
-    //var progressArray: SparseArray<Int> = SparseArray()
-    private lateinit var recordedTimes: ProgressArray
+
+    private lateinit var progressArray: ProgressArray
+
     //var savedProgressFile = File(filesDir, "SavedProgress")
     lateinit var savedProgressFile: File
 
@@ -58,6 +59,9 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
                     }, {}))
             }
 
+            progressArray.times.put(selectedBookViewModel.getSelectedBook().value!!.id, bookProgress.progress)
+            Log.d("Time in sparse array", progressArray.times.get(selectedBookViewModel.getSelectedBook().value!!.id).toString())
+
             // Everything that follows is to prevent possible NullPointerExceptions that can occur
             // when the activity first loads (after config change or opening after closing)
             // since the service can (and will) send updates via the handler before the activity fully
@@ -69,7 +73,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
                         var progress = ((bookProgress.progress / it.duration.toFloat()) * 100).toInt()
                         setPlayProgress(progress)
 
-                        recordedTimes.times.put(playingBookViewModel.getPlayingBook().value!!.id, bookProgress.progress)
+                        progressArray.times.put(playingBookViewModel.getPlayingBook().value!!.id, bookProgress.progress)
                     }
                 }
             }
@@ -129,14 +133,13 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
             savedProgressFile.createNewFile()
         }
 
-
-        var fis = FileInputStream(savedProgressFile)
-        var ois = ObjectInputStream(fis)
-        if(ois.readObject() as ProgressArray != null){
-            recordedTimes = ois.readObject() as ProgressArray
-        }
-        ois.close()
-        fis.close()
+//        var fis = FileInputStream(savedProgressFile)
+//        var ois = ObjectInputStream(fis)
+//        if(ois.readObject() as ProgressArray != null){
+//            recordedTimes = ois.readObject() as ProgressArray
+//        }
+//        ois.close()
+//        fis.close()
 
 //        var t = SparseArray<Int>()
 //        recordedTimes = ProgressArray(t)
@@ -219,20 +222,36 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
             val selectedBook = selectedBookViewModel.getSelectedBook().value
             var selectedUrl = "https://kamorris.com/lab/audlib/download.php?id=" + selectedBook!!.id
 
-            if(recordedTimes.times.get(selectedBook.id) == null){
-                recordedTimes.times.put(selectedBook.id, 0)
+            if(!::progressArray.isInitialized){
+                progressArray = ProgressArray(SparseArray())
+            }
+
+            if(progressArray.times.get(selectedBook.id) == null){
+                Log.d("gets", "here")
+                progressArray.times.put(selectedBook.id, 0)
+            }
+
+            var fis = FileInputStream(savedProgressFile)
+            if(fis.read() != -1){
+                var ois = ObjectInputStream(fis)
+                if(ois.readObject() as ProgressArray != null){
+                    progressArray = ois.readObject() as ProgressArray
+                    Log.d("Progress after reading in", progressArray.times.get(selectedBookViewModel.getSelectedBook().value!!.id).toString())
+                }
+                ois.close()
+                fis.close()
             }
 
             //play from file if it exists in internal storage
             if(fileExists("${selectedBook!!.id}.mp3")){
                 Log.d("Playing", "downloaded file")
                 //var time = preferences.getInt("${selectedBook!!.id}_key", 0)
-                Log.d("Time in array", recordedTimes.times.get(selectedBook.id).toString())
-                mediaControlBinder.play(File(filesDir, "${selectedBook!!.id}.mp3"), recordedTimes.times.get(selectedBook.id))
+                Log.d("Time in array", progressArray.times.get(selectedBook.id).toString())
+                mediaControlBinder.play(File(filesDir, "${selectedBook!!.id}.mp3"), progressArray.times.get(selectedBook.id))
             }
             else{ //if file doesn't exist, stream it for now and download the mp3 file
                 Log.d("Book", "not downloaded yet")
-                mediaControlBinder.seekTo(recordedTimes.times.get(selectedBook.id))
+                mediaControlBinder.seekTo(progressArray.times.get(selectedBook.id))
                 mediaControlBinder.play(selectedBook!!.id)
                 DownloadAudio(this, selectedBook!!.id.toString()).execute(selectedUrl)
             }
@@ -245,13 +264,14 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
     override fun pause() {
         if (connected) {
             mediaControlBinder.pause()
+            Log.d("Time in array after pause", progressArray.times.get(selectedBookViewModel.getSelectedBook().value!!.id).toString())
         }
     }
 
     override fun stop() {
         if (connected) {
             //set progress back to zero
-            recordedTimes.times.put(selectedBookViewModel.getSelectedBook().value!!.id, 0)
+            progressArray.times.put(selectedBookViewModel.getSelectedBook().value!!.id, 0)
 
             mediaControlBinder.stop()
             stopService(serviceIntent)
@@ -275,7 +295,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         var fos = openFileOutput(savedProgressFile.name, Context.MODE_PRIVATE)
         var oos = ObjectOutputStream(fos)
 
-        oos.writeObject(recordedTimes)
+        oos.writeObject(progressArray)
         oos.close()
         fos.close()
     }
