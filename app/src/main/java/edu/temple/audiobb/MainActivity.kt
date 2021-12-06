@@ -20,7 +20,7 @@ import java.io.*
 
 private const val SAVED_PROGRESS_KEY = "saved_progress"
 
-class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface , ControlFragment.MediaControlInterface{
+class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface , ControlFragment.MediaControlInterface, Serializable{
 
     private lateinit var bookListFragment : BookListFragment
     private lateinit var serviceIntent : Intent
@@ -133,17 +133,6 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
             savedProgressFile.createNewFile()
         }
 
-//        var fis = FileInputStream(savedProgressFile)
-//        var ois = ObjectInputStream(fis)
-//        if(ois.readObject() as ProgressArray != null){
-//            recordedTimes = ois.readObject() as ProgressArray
-//        }
-//        ois.close()
-//        fis.close()
-
-//        var t = SparseArray<Int>()
-//        recordedTimes = ProgressArray(t)
-
         preferences = getSharedPreferences(SAVED_PROGRESS_KEY, Context.MODE_PRIVATE)
 
         playingBookViewModel.getPlayingBook().observe(this, {
@@ -222,15 +211,16 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
             val selectedBook = selectedBookViewModel.getSelectedBook().value
             var selectedUrl = "https://kamorris.com/lab/audlib/download.php?id=" + selectedBook!!.id
 
+            //var t = SparseArray<Int>()
             if(!::progressArray.isInitialized){
-                progressArray = ProgressArray(SparseArray())
+                progressArray = ProgressArray(SparseArray<Int>())
             }
 
             if(progressArray.times.get(selectedBook.id) == null){
                 progressArray.times.put(selectedBook.id, 0)
             }
 
-            var fis = FileInputStream(savedProgressFile)
+            var fis = FileInputStream(savedProgressFile.absolutePath)
 
             if(fis.channel.size() != 0L){
                 Log.d("after", "fis.read")
@@ -293,7 +283,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
     }
 
     fun saveTimesToFile(){
-        var fos = openFileOutput(savedProgressFile.name, Context.MODE_PRIVATE)
+        var fos = FileOutputStream(savedProgressFile.absolutePath)
         var oos = ObjectOutputStream(fos)
 
         oos.writeObject(progressArray)

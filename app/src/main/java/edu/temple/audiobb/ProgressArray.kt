@@ -1,14 +1,10 @@
 package edu.temple.audiobb
 
 import android.util.SparseArray
-import androidx.lifecycle.ViewModel
 import java.io.Serializable
 
-data class ProgressArray(var times: SparseArray<Int>): Serializable{
+data class ProgressArray(val times: SparseArray<Int>): Serializable{
+    companion object {
+        private const val serialVersionUID: Long = -5133191997535836845L
+    }
 }
-
-//class ProgressArray(): ViewModel(), Serializable {
-//    private val times: SparseArray<Int> by lazy {
-//        SparseArray()
-//    }
-//}
