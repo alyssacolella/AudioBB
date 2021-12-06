@@ -7,9 +7,10 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
-import android.util.SparseArray
 import android.view.View
+import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
 import com.android.volley.Request
@@ -19,6 +20,7 @@ import edu.temple.audlibplayer.PlayerService
 import java.io.*
 
 private const val SAVED_PROGRESS_KEY = "saved_progress"
+private const val SAVED_USER_CHANGES_KEY = "saved_user_changes"
 
 class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface , ControlFragment.MediaControlInterface, Serializable{
 
@@ -28,6 +30,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
     private var connected = false
     private lateinit var preferences: SharedPreferences
     lateinit var savedProgressFile: File
+
 
     var timesMap = HashMap<Int, Int>()
 
@@ -122,12 +125,22 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        //create file if it doesn't exist already
         savedProgressFile = File(filesDir, "SavedProgress")
         if(!savedProgressFile.exists()){
             savedProgressFile.createNewFile()
         }
 
-        preferences = getSharedPreferences(SAVED_PROGRESS_KEY, Context.MODE_PRIVATE)
+        //get shared preferences, retrieve last currently playing book
+        var savedProgressFile = getSharedPreferences(savedProgressFile.name, Context.MODE_PRIVATE)
+        var lastPlayedBookId = savedProgressFile.getInt("currently_playing", 0)
+        Log.d("Last playing", "Book $lastPlayedBookId")
+
+        //get the last search string entered by the user
+        var lastSearch = savedProgressFile.getString("last_search", null)
+        if (lastSearch != null) {
+            Log.d("Last search", lastSearch)
+        }
 
         playingBookViewModel.getPlayingBook().observe(this, {
             (supportFragmentManager.findFragmentById(R.id.controlFragmentContainerView) as ControlFragment).setNowPlaying(it.title)
@@ -179,7 +192,9 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
 
     override fun onBackPressed() {
         // Back press clears the selected book
-        saveTimesToFile()
+
+        //save the progress to shared preferences
+        updatePrefFiles()
         selectedBookViewModel.setSelectedBook(null)
         super.onBackPressed()
     }
@@ -202,12 +217,18 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
 
             Log.d("Button pressed", "Play button")
 
+            //identify the selected book, and create the url to download
             val selectedBook = selectedBookViewModel.getSelectedBook().value
             var selectedUrl = "https://kamorris.com/lab/audlib/download.php?id=" + selectedBook!!.id
 
+            //if the hash map doesn't have a time for the book, check shared preferences
             if(!(timesMap.containsKey(selectedBook.id))) {
                 var timeValues = getSharedPreferences(savedProgressFile.name, Context.MODE_PRIVATE)
+
+                //if no entry found, return 0 to play from the start
                 var time = timeValues.getInt(selectedBook.id.toString(), 0)
+
+                //update hash map
                 timesMap[selectedBook.id] = time
             }
 
@@ -223,6 +244,8 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
 
                 mediaControlBinder.seekTo(timesMap[selectedBook.id]!!)
                 mediaControlBinder.play(selectedBook!!.id)
+
+                //download the audio while it streams
                 DownloadAudio(this, selectedBook!!.id.toString()).execute(selectedUrl)
             }
 
@@ -257,21 +280,30 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         Log.d("File path", path)
 
         val file = File(path)
+
+        //check if the file exists in internal storage
         return file.exists()
     }
 
-    fun saveTimesToFile(){
+    fun updatePrefFiles(){
 
         var timeValues = getSharedPreferences(savedProgressFile.name, Context.MODE_PRIVATE)
         var editor = timeValues.edit()
         for(i in timesMap.keys){
+            //add each hash map entry to shared preferences
             editor.putInt(i.toString(), timesMap[i]!!)
         }
+        //add the last currently playing book to shared preferences
+        editor.putInt("currently_playing",
+            playingBookViewModel.getPlayingBook().value!!.id
+        )
         editor.commit()
     }
 
     override fun onDestroy() {
-        saveTimesToFile()
+
+        //save progress to shared preferences
+        updatePrefFiles()
         super.onDestroy()
         unbindService(serviceConnection)
     }
