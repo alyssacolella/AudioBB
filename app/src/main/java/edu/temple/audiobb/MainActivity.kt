@@ -227,12 +227,13 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
             }
 
             if(progressArray.times.get(selectedBook.id) == null){
-                Log.d("gets", "here")
                 progressArray.times.put(selectedBook.id, 0)
             }
 
             var fis = FileInputStream(savedProgressFile)
-            if(fis.read() != -1){
+
+            if(fis.channel.size() != 0L){
+                Log.d("after", "fis.read")
                 var ois = ObjectInputStream(fis)
                 if(ois.readObject() as ProgressArray != null){
                     progressArray = ois.readObject() as ProgressArray
