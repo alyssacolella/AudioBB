@@ -31,7 +31,6 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
     private lateinit var preferences: SharedPreferences
     lateinit var savedProgressFile: File
 
-
     var timesMap = HashMap<Int, Int>()
 
     val audiobookHandler = Handler(Looper.getMainLooper()) { msg ->
@@ -82,8 +81,26 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
     private val searchRequest = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         supportFragmentManager.popBackStack()
         it.data?.run {
-            bookListViewModel.copyBooks(getSerializableExtra(BookList.BOOKLIST_KEY) as BookList)
+            var results = getSerializableExtra(BookList.BOOKLIST_KEY) as BookList
+            bookListViewModel.copyBooks(results)
             bookListFragment.bookListUpdated()
+
+            //trying to write book list object to shared pref
+
+            var savedProgress = getSharedPreferences(savedProgressFile.name, Context.MODE_PRIVATE)
+            var editor = savedProgress.edit()
+
+
+//            for(b in results.size()){
+//                Log.d("Book List Item $b", results[b].toString())
+//            }
+
+            Log.d("last search in run", results.toString())
+            editor.putString("last_search", results.toString())
+
+//            editor.putString("last_search",
+//                findViewById<EditText>(R.id.searchStringEditText).text.toString()
+//            )
         }
 
     }
@@ -217,20 +234,30 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
 
             Log.d("Button pressed", "Play button")
 
+            var sharedPref = getSharedPreferences(savedProgressFile.name, Context.MODE_PRIVATE)
+            var editor = sharedPref.edit()
+
+            //add the last currently playing book to shared preferences
+            editor.putInt("currently_playing",
+                selectedBookViewModel.getSelectedBook().value!!.id
+            )
+            editor.commit()
+
             //identify the selected book, and create the url to download
             val selectedBook = selectedBookViewModel.getSelectedBook().value
             var selectedUrl = "https://kamorris.com/lab/audlib/download.php?id=" + selectedBook!!.id
 
             //if the hash map doesn't have a time for the book, check shared preferences
             if(!(timesMap.containsKey(selectedBook.id))) {
-                var timeValues = getSharedPreferences(savedProgressFile.name, Context.MODE_PRIVATE)
+                var sharedPref = getSharedPreferences(savedProgressFile.name, Context.MODE_PRIVATE)
 
                 //if no entry found, return 0 to play from the start
-                var time = timeValues.getInt(selectedBook.id.toString(), 0)
+                var time = sharedPref.getInt(selectedBook.id.toString(), 0)
 
                 //update hash map
                 timesMap[selectedBook.id] = time
             }
+            Log.d("Time in map to play from", "${timesMap[selectedBook.id]}")
 
             //play from file if it exists in internal storage
             if(fileExists("${selectedBook!!.id}.mp3")){
@@ -287,16 +314,12 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
 
     fun updatePrefFiles(){
 
-        var timeValues = getSharedPreferences(savedProgressFile.name, Context.MODE_PRIVATE)
-        var editor = timeValues.edit()
+        var sharedPref = getSharedPreferences(savedProgressFile.name, Context.MODE_PRIVATE)
+        var editor = sharedPref.edit()
         for(i in timesMap.keys){
             //add each hash map entry to shared preferences
             editor.putInt(i.toString(), timesMap[i]!!)
         }
-        //add the last currently playing book to shared preferences
-        editor.putInt("currently_playing",
-            playingBookViewModel.getPlayingBook().value!!.id
-        )
         editor.commit()
     }
 
@@ -307,4 +330,5 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
         super.onDestroy()
         unbindService(serviceConnection)
     }
+
 }

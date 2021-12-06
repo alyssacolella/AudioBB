@@ -21,12 +21,12 @@ class SearchActivity : AppCompatActivity() {
             val url = "https://kamorris.com/lab/cis3515/search.php?term=" +
                     findViewById<EditText>(R.id.searchStringEditText).text.toString()
 
-            var savedProgressFile = File(filesDir, "SavedProgress")
-            var savedProgress = getSharedPreferences(savedProgressFile.name, Context.MODE_PRIVATE)
-            var editor = savedProgress.edit()
-            editor.putString("last_search",
-                findViewById<EditText>(R.id.searchStringEditText).text.toString()
-            )
+//            var savedProgressFile = File(filesDir, "SavedProgress")
+//            var savedProgress = getSharedPreferences(savedProgressFile.name, Context.MODE_PRIVATE)
+//            var editor = savedProgress.edit()
+//            editor.putString("last_search",
+//                findViewById<EditText>(R.id.searchStringEditText).text.toString()
+//            )
 
             Volley.newRequestQueue(this).add(
                 JsonArrayRequest(Request.Method.GET, url, null, {

@@ -33,6 +33,7 @@ class BookList : ViewModel(), Serializable{
         bookList.addAll(newBooks.bookList)
     }
 
+
     operator fun get(index: Int) = bookList.get(index)
 
     fun size() = bookList.size
