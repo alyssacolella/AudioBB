@@ -96,6 +96,7 @@ class MainActivity : AppCompatActivity(), BookListFragment.BookSelectedInterface
 //            }
 
             Log.d("last search in run", results.toString())
+            Log.d("1st result", results[0].toString())
             editor.putString("last_search", results.toString())
 
 //            editor.putString("last_search",
